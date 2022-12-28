@@ -1,3 +1,5 @@
+add_subdirectory(MiClouds)
+
 add_library(WaveSabreCore
 	include/WaveSabreCore/Adultery.h
 	include/WaveSabreCore/AllPass.h
@@ -27,6 +29,7 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/StateVariableFilter.h
 	include/WaveSabreCore/SynthDevice.h
 	include/WaveSabreCore/Twister.h
+	include/WaveSabreCore/Harvester.h
 	include/WaveSabreCore/Deprecated/Thunder.h
 	src/Adultery.cpp
 	src/AllPass.cpp
@@ -55,12 +58,15 @@ add_library(WaveSabreCore
 	src/StateVariableFilter.cpp
 	src/SynthDevice.cpp
 	src/Twister.cpp
+	src/Harvester.cpp
 	src/Deprecated/Thunder.cpp)
 
-target_link_libraries(WaveSabreCore Msacm32.lib)
-target_include_directories(WaveSabreCore PUBLIC include)
+add_compile_definitions(TEST)
+target_link_libraries(WaveSabreCore Msacm32.lib MiClouds)
+target_include_directories(WaveSabreCore PUBLIC include "${CMAKE_SOURCE_DIR}/eurorack")
 
 if(MSVC)
+	add_compile_definitions(_USE_MATH_DEFINES) # defines M_PI with MSVC
 	target_compile_options(WaveSabreCore
 		PUBLIC $<$<CONFIG:MinSizeRel>:/GS- /Gy /Zi /GL /GR->
 		PRIVATE $<$<CONFIG:MinSizeRel>:/Oi /fp:fast>)

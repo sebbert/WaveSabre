@@ -24,7 +24,8 @@ namespace WaveSabrePlayerLib
 			Twister,
 			Cathedral,
 			Adultery,
-			Specimen
+			Specimen,
+			Harvester,
 		};
 
 		typedef WaveSabreCore::Device *(*DeviceFactory)(DeviceId);

@@ -19,7 +19,8 @@ namespace WaveSabreConvert
             Twister,
             Cathedral,
             Adultery,
-            Specimen
+            Specimen,
+            Harvester,
         }
 
         public class Receive
