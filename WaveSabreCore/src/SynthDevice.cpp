@@ -40,9 +40,10 @@ namespace WaveSabreCore
 		int originalNumSamples = numSamples;
 		clearOutputs(outputs, numSamples);
 
-		float *runningOutputs[2];
-		runningOutputs[0] = outputs[0];
-		runningOutputs[1] = outputs[1];
+		float *runningInputs[2];
+		runningInputs[0] = inputs[2];
+		runningInputs[1] = inputs[3];
+		float *runningOutputs[2] { outputs[0], outputs[1] };
 
 		while (numSamples)
 		{
@@ -155,13 +156,15 @@ namespace WaveSabreCore
 
 			for (int i = 0; i < maxVoices; i++)
 			{
-				if (voices[i]->IsOn) voices[i]->Run(songPosition, runningOutputs, samplesToNextEvent);
+				if (voices[i]->IsOn) voices[i]->Run(songPosition, runningInputs, runningOutputs, samplesToNextEvent);
 			}
 			for (int i = 0; i < maxEvents; i++)
 			{
 				if (events[i].Type != EventType::None) events[i].DeltaSamples -= samplesToNextEvent;
 			}
 			songPosition += (double)samplesToNextEvent / Helpers::CurrentSampleRate;
+			runningInputs[0] += samplesToNextEvent;
+			runningInputs[1] += samplesToNextEvent;
 			runningOutputs[0] += samplesToNextEvent;
 			runningOutputs[1] += samplesToNextEvent;
 			numSamples -= samplesToNextEvent;
