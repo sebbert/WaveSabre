@@ -50,7 +50,12 @@ namespace WaveSabreCore
 
 			virtual SynthDevice *GetSynthDevice() const = 0;
 
-			virtual void Run(double songPosition, float **outputs, int numSamples) = 0;
+			virtual void Run(double songPosition, float **inputs, float **outputs, int numSamples)
+			{
+				Run(songPosition, outputs, numSamples);
+			}
+
+			virtual void Run(double songPosition, float **outputs, int numSamples) {}
 
 			virtual void NoteOn(int note, int velocity, float detune, float pan);
 			virtual void NoteOff();
