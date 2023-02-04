@@ -41,3 +41,19 @@ bool SmasherVst::getProductString(char *text)
 	vst_strncpy(text, "WaveSabre - Smasher", kVstMaxProductStrLen);
 	return true;
 }
+
+
+bool SmasherVst::getInputProperties (VstInt32 index, VstPinProperties* properties)
+{
+	if (index & 1) return false; // Only describe first channel of each stereo pair
+
+	properties->flags = kVstPinIsStereo;
+
+	if (index == 2)
+	{
+		vst_strncpy(properties->label, "Sidechain", kVstMaxLabelLen);
+		vst_strncpy(properties->shortLabel, "SC", kVstMaxShortLabelLen);
+	}
+
+	return true;
+}
