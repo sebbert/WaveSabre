@@ -11,7 +11,7 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 }
 
 SlaughterVst::SlaughterVst(audioMasterCallback audioMaster)
-	: VstPlug(audioMaster, (int)Slaughter::ParamIndices::NumParams, 0, 2, 'Sltr', new Slaughter(), true)
+	: VstPlug(audioMaster, (int)Slaughter::ParamIndices::NumParams, 4, 2, 'Sltr', new Slaughter(), true)
 {
 	setEditor(new SlaughterEditor(this));
 }
@@ -43,7 +43,8 @@ void SlaughterVst::getParameterName(VstInt32 index, char *text)
 	case Slaughter::ParamIndices::FilterType: vst_strncpy(text, "Flt Type", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::FilterFreq: vst_strncpy(text, "Flt Freq", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::FilterResonance: vst_strncpy(text, "Flt Res", kVstMaxParamStrLen); break;
-	case Slaughter::ParamIndices::FilterModAmt: vst_strncpy(text, "Flt Mod", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::FilterModAmt: vst_strncpy(text, "Flt Env Mod", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::FilterScAmt: vst_strncpy(text, "Flt Sc Mod", kVstMaxParamStrLen); break;
 
 	case Slaughter::ParamIndices::AmpAttack: vst_strncpy(text, "Amp Atk", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::AmpDecay: vst_strncpy(text, "Amp Dcy", kVstMaxParamStrLen); break;
@@ -85,5 +86,28 @@ bool SlaughterVst::getEffectName(char *name)
 bool SlaughterVst::getProductString(char *text)
 {
 	vst_strncpy(text, "WaveSabre - Slaughter", kVstMaxProductStrLen);
+	return true;
+}
+
+
+bool SlaughterVst::getInputProperties (VstInt32 index, VstPinProperties* properties)
+{
+	if (index & 1) return false; // Only describe first channel of each stereo pair
+
+	properties->flags = kVstPinIsStereo;
+
+	if (index == 0)
+	{
+		vst_strncpy(properties->label, "lol", kVstMaxLabelLen);
+		vst_strncpy(properties->shortLabel, "lol", kVstMaxShortLabelLen);
+
+	}
+
+	if (index == 2)
+	{
+		vst_strncpy(properties->label, "Filter mod", kVstMaxLabelLen);
+		vst_strncpy(properties->shortLabel, "FltMod", kVstMaxShortLabelLen);
+	}
+
 	return true;
 }
