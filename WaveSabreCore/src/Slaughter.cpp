@@ -69,6 +69,7 @@ namespace WaveSabreCore
 		case ParamIndices::FilterFreq: filterFreq = Helpers::ParamToFrequency(value); break;
 		case ParamIndices::FilterResonance: filterResonance = 1.0f - value; break;
 		case ParamIndices::FilterModAmt: filterModAmt = value; break;
+		case ParamIndices::FilterScAmt: filterScAmt = value; break;
 
 		case ParamIndices::AmpAttack: ampAttack = Helpers::ScalarToEnvValue(value); break;
 		case ParamIndices::AmpDecay: ampDecay = Helpers::ScalarToEnvValue(value); break;
@@ -133,6 +134,7 @@ namespace WaveSabreCore
 		case ParamIndices::FilterFreq: return Helpers::FrequencyToParam(filterFreq);
 		case ParamIndices::FilterResonance: return 1.0f - filterResonance;
 		case ParamIndices::FilterModAmt: return filterModAmt;
+		case ParamIndices::FilterScAmt: return filterScAmt;
 
 		case ParamIndices::AmpAttack: return Helpers::EnvValueToScalar(ampAttack);
 		case ParamIndices::AmpDecay: return Helpers::EnvValueToScalar(ampDecay);
@@ -181,7 +183,7 @@ namespace WaveSabreCore
 		return slaughter;
 	}
 
-	void Slaughter::SlaughterVoice::Run(double songPosition, float **outputs, int numSamples)
+	void Slaughter::SlaughterVoice::Run(double songPosition, float **inputs, float **outputs, int numSamples)
 	{
 		double vibratoFreq = slaughter->VibratoFreq / Helpers::CurrentSampleRate;
 
@@ -203,7 +205,13 @@ namespace WaveSabreCore
 
 		for (int i = 0; i < numSamples; i++)
 		{
-			filter.SetFreq(Helpers::Clamp(slaughter->filterFreq + modEnv.GetValue() * (20000.0f - 20.0f) * (slaughter->filterModAmt * 2.0f - 1.0f), 0.0f, 20000.0f - 20.0f));
+			constexpr float filterFreqRange = 20000.0f - 20.0f;
+
+			float filterEnvMod = modEnv.GetValue() * (slaughter->filterModAmt * 2.0f - 1.0f);
+			float scInput = inputs[0][i];
+			float filterSidechainMod = scInput * (slaughter->filterScAmt * 2.0f - 1.0f);
+			float filterMod = filterEnvMod + filterSidechainMod;
+			filter.SetFreq(Helpers::Clamp(slaughter->filterFreq + filterMod * filterFreqRange, 0.0f, filterFreqRange));
 
 			double baseNote = GetNote() + Detune + pitchEnv.GetValue() * slaughter->pitchEnvAmt + Helpers::FastSin(vibratoPhase) * slaughter->VibratoAmount + slaughter->Rise * 24.0f;
 			float oscMix = 0.0;

@@ -60,6 +60,7 @@ void SlaughterEditor::Open()
 	addKnob((VstInt32)Slaughter::ParamIndices::FilterFreq, "FLT FREQ");
 	addKnob((VstInt32)Slaughter::ParamIndices::FilterResonance, "FLT RES");
 	addKnob((VstInt32)Slaughter::ParamIndices::FilterModAmt, "M ENV AMT");
+	addKnob((VstInt32)Slaughter::ParamIndices::FilterScAmt, "M SC AMT");
 
 	startNextRow();
 

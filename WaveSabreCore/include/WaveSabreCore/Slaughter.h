@@ -67,6 +67,8 @@ namespace WaveSabreCore
 			VoiceMode,
 			SlideTime,
 
+			FilterScAmt,
+
 			NumParams,
 		};
 
@@ -82,7 +84,7 @@ namespace WaveSabreCore
 			SlaughterVoice(Slaughter *slaughter);
 			virtual WaveSabreCore::SynthDevice *GetSynthDevice() const;
 
-			virtual void Run(double songPosition, float **outputs, int numSamples);
+			virtual void Run(double songPosition, float** inputs, float **outputs, int numSamples) override;
 
 			virtual void NoteOn(int note, int velocity, float detune, float pan);
 			virtual void NoteOff();
@@ -112,7 +114,7 @@ namespace WaveSabreCore
 		float osc3Waveform, osc3PulseWidth, osc3Volume, osc3DetuneCoarse, osc3DetuneFine;
 		float noiseVolume;
 		StateVariableFilterType filterType;
-		float filterFreq, filterResonance, filterModAmt;
+		float filterFreq, filterResonance, filterModAmt, filterScAmt;
 		float ampAttack, ampDecay, ampSustain, ampRelease;
 		float modAttack, modDecay, modSustain, modRelease;
 		float pitchAttack, pitchDecay, pitchSustain, pitchRelease, pitchEnvAmt;

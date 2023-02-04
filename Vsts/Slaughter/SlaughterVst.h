@@ -13,6 +13,7 @@ public:
 
 	virtual bool getEffectName(char *name);
 	virtual bool getProductString(char *text);
+	virtual bool getInputProperties (VstInt32 index, VstPinProperties* properties);
 };
 
 #endif
