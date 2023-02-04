@@ -30,6 +30,7 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/SynthDevice.h
 	include/WaveSabreCore/Twister.h
 	include/WaveSabreCore/Harvester.h
+	include/WaveSabreCore/Washington.h
 	include/WaveSabreCore/Deprecated/Thunder.h
 	src/Adultery.cpp
 	src/AllPass.cpp
@@ -59,6 +60,7 @@ add_library(WaveSabreCore
 	src/SynthDevice.cpp
 	src/Twister.cpp
 	src/Harvester.cpp
+	src/Washington.cpp
 	src/Deprecated/Thunder.cpp)
 
 add_compile_definitions(TEST)

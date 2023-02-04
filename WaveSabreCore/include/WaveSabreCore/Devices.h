@@ -15,6 +15,7 @@
 #include "Twister.h"
 #include "Cathedral.h"
 #include "Harvester.h"
+#include "Washington.h"
 
 #include "Deprecated/Thunder.h"
 
