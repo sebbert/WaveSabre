@@ -6,6 +6,7 @@
         "*.cml": "xml",
         "*.component": "xml",
         "*.display": "xml",
+        "*.template": "xml",
         "algorithm": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -75,6 +76,9 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "*.rh": "cpp"
     }
 }
