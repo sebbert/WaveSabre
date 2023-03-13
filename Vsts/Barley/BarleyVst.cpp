@@ -11,9 +11,9 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 }
 
 BarleyVst::BarleyVst(audioMasterCallback audioMaster)
-	: VstPlug(audioMaster, (int)Barley::ParamIndices::NumParams, 2, 2, 'Brly', new Barley())
+	: VstPlug(audioMaster, (int)Barley::ParamIndices::NumParams, 2, 2, 'Brly', new Barley(), true)
 {
-	setEditor(new BarleyEditor(this));
+	setEditor(new BarleyEditor(this, (Barley*)getDevice()));
 }
 
 static const char* getParameterNameImpl(Barley::ParamIndices index)
