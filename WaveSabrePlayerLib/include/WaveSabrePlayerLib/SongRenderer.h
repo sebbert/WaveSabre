@@ -26,6 +26,8 @@ namespace WaveSabrePlayerLib
 			Adultery,
 			Specimen,
 			Harvester,
+			Washington,
+			Barley,
 		};
 
 		typedef WaveSabreCore::Device *(*DeviceFactory)(DeviceId);

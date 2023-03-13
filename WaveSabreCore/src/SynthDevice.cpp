@@ -154,10 +154,8 @@ namespace WaveSabreCore
 				}
 			}
 
-			for (int i = 0; i < maxVoices; i++)
-			{
-				if (voices[i]->IsOn) voices[i]->Run(songPosition, runningInputs, runningOutputs, samplesToNextEvent);
-			}
+			Render(songPosition, runningInputs, runningOutputs, samplesToNextEvent);
+
 			for (int i = 0; i < maxEvents; i++)
 			{
 				if (events[i].Type != EventType::None) events[i].DeltaSamples -= samplesToNextEvent;
@@ -168,6 +166,15 @@ namespace WaveSabreCore
 			runningOutputs[0] += samplesToNextEvent;
 			runningOutputs[1] += samplesToNextEvent;
 			numSamples -= samplesToNextEvent;
+		}
+	}
+
+	void SynthDevice::Render(double songPosition, float **inputs, float **outputs, int numSamples)
+	{
+		for (int i = 0; i < maxVoices; i++)
+		{
+			if (voices[i]->IsOn)
+				voices[i]->Run(songPosition, inputs, outputs, numSamples);
 		}
 	}
 
