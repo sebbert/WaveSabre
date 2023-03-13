@@ -29,6 +29,7 @@ namespace WaveSabreCore
 		case ParamIndices::Release: release = Helpers::ScalarToEnvValue(value); break;
 		case ParamIndices::KeyMod: keyMod = value; break;
 		case ParamIndices::Gain: gain = value; break;
+		default: break;
 		}
 	}
 
@@ -42,6 +43,7 @@ namespace WaveSabreCore
 		case ParamIndices::Release: return Helpers::EnvValueToScalar(release);
 		case ParamIndices::KeyMod: return keyMod;
 		case ParamIndices::Gain: return gain;
+		default: return 0.0f;
 		}
 	}
 

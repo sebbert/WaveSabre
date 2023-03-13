@@ -18,6 +18,7 @@ namespace WaveSabreCore
 		virtual ~SynthDevice();
 
 		virtual void Run(double songPosition, float **inputs, float **outputs, int numSamples);
+		virtual void Render(double songPosition, float** inputs, float** outputs, int numSamples);
 
 		virtual void AllNotesOff();
 		virtual void NoteOn(int note, int velocity, int deltaSamples);
