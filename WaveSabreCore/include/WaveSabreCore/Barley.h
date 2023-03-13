@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Device.h"
+#include "SynthDevice.h"
 #include <cstdint>
 
 namespace WaveSabreCore
@@ -8,8 +9,7 @@ namespace WaveSabreCore
 	class Barley : public SynthDevice
 	{
 	public:
-		constexpr static auto MaxGrains = 128;
-		constexpr static auto MaxBlockSize = 256;
+		constexpr static auto MaxGrains = 64;
 
 		enum class ParamIndices
 		{
@@ -39,11 +39,13 @@ namespace WaveSabreCore
 		virtual void SetParam(int index, float value);
 		virtual float GetParam(int index) const;
 
+	int prevFreeGrainCount;
+
 	protected:
 		float *buffer;
 		int bufferSize;
 		int xfadeSize;
-		size_t writeHead;
+		int writeHead;
 
 		float bufferSizeParam;
 		float xfadeAmt;
@@ -55,18 +57,21 @@ namespace WaveSabreCore
 		float probability;
 		float density;
 
-
+		int nextGrainCountdown;
 
 
 		struct Grain
 		{
-			double position;
-			double positionIncrement;
+			int firstSample;
 			int size;
 			int preDelay;
+			double phase;
+			double phaseIncrement;
 
 			float envSmooth;
 			float envSlope;
+			float envPhase;
+			float envPhaseIncrement;
 			
 			float gainL;
 			float gainR;
@@ -90,10 +95,8 @@ namespace WaveSabreCore
 			BarleyVoice(Barley* device);
 			
 			virtual SynthDevice *GetSynthDevice() const;
-
 			virtual void Run(double songPosition, float **outputs, int numSamples);
-			virtual void NoteOn(int note, int velocity, float detune, float pan);
-			virtual void NoteOff();
+
 			Barley* device;
 		};
 
