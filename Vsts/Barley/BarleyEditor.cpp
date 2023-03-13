@@ -1,10 +1,15 @@
 #include "BarleyEditor.h"
-
+#include "BarleyVst.h"
 #include <WaveSabreCore.h>
+
+#include <string>
+#include <sstream>
+
 using namespace WaveSabreCore;
 
-BarleyEditor::BarleyEditor(AudioEffect *audioEffect)
+BarleyEditor::BarleyEditor(AudioEffect *audioEffect, Barley* barley)
 	: VstEditor(audioEffect, 250, 300, "Barley")
+	, barley(barley)
 {
 }
 
@@ -14,14 +19,14 @@ BarleyEditor::~BarleyEditor()
 
 void BarleyEditor::Open()
 {
-	addKnob((VstInt32)Barley::ParamIndices::Position, "POSITION");
+	addKnob((VstInt32)Barley::ParamIndices::GrainPosition, "POSITION");
 	addSpacer();
-	addKnob((VstInt32)Barley::ParamIndices::Size, "SIZE");
+	addKnob((VstInt32)Barley::ParamIndices::GrainSize, "SIZE");
 	startNextRow();
-	
-	
-	
-	addKnob((VstInt32)Barley::ParamIndices::DryWet, "DRY/WET");
 
 	VstEditor::Open();
+}
+
+void BarleyEditor::doIdleStuff()
+{
 }

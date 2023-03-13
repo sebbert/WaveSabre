@@ -13,16 +13,21 @@ namespace WaveSabreCore
 	Barley::Barley()
 		: SynthDevice((int)ParamIndices::NumParams)
 	{
+		for (int i = 0; i < maxVoices; i++) voices[i] = new BarleyVoice(this);
+
+		buffer = nullptr;
+		bufferSize = 0;
 		writeHead = 0;
-		bufferSizeParam = 0.5f;
-		xfadeAmt = 0.4f;
-		grainPosition = 0.0f;
+		bufferSizeParam = 0.7f;
+		xfadeAmt = 0.1f;
+		grainPosition = 0.5f;
 		grainPositionSpread = 0.1f;
-		grainSize = 0.5f;
-		grainSizeSpread = 0.2f;
-		probability = 0.5f;
+		grainSize = 0.1f;
+		grainSizeSpread = 0.5f;
+		probability = 4.0f / Helpers::CurrentSampleRate;
 		density = 0.5f;
 		stereoSpread = 0.5f;
+		nextGrainCountdown = 0;
 	}
 
 	Barley::~Barley()
@@ -82,9 +87,10 @@ namespace WaveSabreCore
 				writeHead -= bufferSize;
 		}
 
-		xfadeSize = (int)(bufferSize - bufferSize * xfadeAmt);
+		xfadeSize = (int)(bufferSize * xfadeAmt);
 
 		activeVoiceCount = 0;
+
 		SynthDevice::Run(songPosition, inputs, outputs, numSamples);
 	}
 
@@ -92,28 +98,37 @@ namespace WaveSabreCore
 	{
 		SynthDevice::Render(songPosition, inputs, outputs, numSamples);
 
-		// Build a list of grains that are not currently running
-		freeGrainCount = 0;
-		for (auto i = 0; i < MaxGrains; ++i)
+
+		// Schedule new grains
+		if (activeVoiceCount)
 		{
-			auto& grain = grains[i];
-			if (!grain.active)
+			// Build a list of grains that are not currently running
+			freeGrainCount = 0;
+			for (auto i = 0; i < MaxGrains; ++i)
 			{
-				freeGrains[freeGrainCount++] = i;
+				auto& grain = grains[i];
+				if (!grain.active)
+				{
+					freeGrains[freeGrainCount++] = i;
+				}
+			}
+
+			for (auto i = 0; i < numSamples && freeGrainCount > 0; ++i)
+			{
+				// if (Helpers::RandFloat() < probability)
+				if (--nextGrainCountdown <= 0)
+				{
+					nextGrainCountdown = (int)(Helpers::CurrentSampleRate / 12.0);
+
+					--freeGrainCount;
+					auto grainIndex = freeGrains[freeGrainCount];
+					auto grain = &grains[grainIndex];
+					ScheduleGrain(grain, i);
+				}
 			}
 		}
 
-		// Schedule new grains
-		for (auto i = 0; freeGrainCount && i < numSamples; ++i)
-		{
-			if (Helpers::RandFloat() < probability)
-			{
-				--freeGrainCount;
-				auto grainIndex = freeGrains[freeGrainCount];
-				auto grain = &grains[grainIndex];
-				ScheduleGrain(grain, i);
-			}
-		}
+		prevFreeGrainCount = freeGrainCount;
 
 		for (auto i = 0; i < MaxGrains; ++i)
 		{
@@ -122,12 +137,20 @@ namespace WaveSabreCore
 		}
 	}
 
+	static inline double ModEuclid(double x, double y)
+	{
+		auto r = fmod(x, y);
+		if (x < 0) r += y;
+		return r;
+	}
+
 	void Barley::ScheduleGrain(Grain* grain, int preDelay)
 	{
-		auto sizeFactor = grainSize + grainSizeSpread * Helpers::RandFloat() * 2.0f - 1.0f;
-		auto size = (int)(bufferSize * sizeFactor);
+		auto xfadeBufferSize = bufferSize - xfadeSize;
+		auto sizeFactor = grainSize;// + grainSizeSpread * Helpers::RandFloat() * 2.0f - 1.0f;
+		double size = (bufferSize * sizeFactor);
 		if (size < 128) size = 128;
-		if (size > bufferSize) size = bufferSize;
+		if (size > bufferSize * 0.6) size = bufferSize * 0.6;
 
 		auto voiceIndex = (int)(Helpers::RandFloat() * activeVoiceCount);
 		auto voice = activeVoices[voiceIndex];
@@ -135,12 +158,20 @@ namespace WaveSabreCore
 
 		auto pan = stereoSpread * 2.0f * (Helpers::RandFloat() - 0.5f);
 
-		grain->position = writeHead - grainPosition * bufferSize;
-		grain->positionIncrement = freq;
-		grain->size = size;
+		auto available = (double)bufferSize;
+		available -= size*2;
+		if (available < 0) return;
+		auto startPos = writeHead - available * grainPosition;
+
+		grain->firstSample = (int)ModEuclid(startPos, bufferSize);
+		grain->phase = 0.0;
+		grain->phaseIncrement = 1.0; //freq;
+		grain->size = (int)floor(size);
 		grain->active = true;
 		grain->preDelay = preDelay;
-		grain->position = 0.0f;
+		grain->envPhase = 0.0f;
+		grain->envPhaseIncrement = (float)(2.0 / size);
+		grain->envSmooth = 0.5; // TODO: Add parameter
 		
 		if (pan < 0.0f) {
 			grain->gainL = 1.0f;
@@ -151,78 +182,82 @@ namespace WaveSabreCore
 		}
 	}
 
-	static inline double ModEuclid(double x, double n)
-	{
-		auto r = fmod(x, n);
-		if (x < 0) r += n;
-		return r;
-	}
-
-	void Barley::Grain::Run(Barley* device, float** outputs, int numSamples)
+	void Barley::Grain::Run(Barley* device, float** outputs, const int numSamples)
 	{
 		if (!active) return;
 
-		auto outputL = outputs[0];
-		auto outputR = outputs[1];
-		auto remaining = numSamples;
-
-		while (preDelay && remaining)
-		{
-			++outputL;
-			++outputR;
-			--remaining;
-			--preDelay;
-		}
-
-		auto bufferSize = device->bufferSize;
-		auto writeHead = device->writeHead;
-		auto xfadeSize = device->xfadeSize;
-		auto xfadeBufferSize = bufferSize - device->xfadeSize;
-		double invXfadeSize = 1.0 / xfadeSize;
-
 		float frame[2];
 
-		while (remaining--)
+		const auto bufferSize = device->bufferSize;
+		const auto writeHead = device->writeHead;
+		const auto xfadeSize = device->xfadeSize;
+		const auto xfadeBufferSize = bufferSize - device->xfadeSize;
+		const double invXfadeSize = 1.0 / xfadeSize;
+		
+		int index = preDelay;
+		if (index > numSamples) index = numSamples;
+		preDelay = 0;
+
+		for (; index < numSamples; ++index)
 		{
+			auto position = firstSample + phase;
 			double xfadeEnd = writeHead;
 			double xfadeStart = xfadeEnd - xfadeSize;
-			double samplePos = ModEuclid(position, xfadeBufferSize);
+			double samplePos = ModEuclid(position, bufferSize);
 
 			device->ReadFrame(samplePos, frame);
-
+/*
 			double adjustedPos = samplePos;
 			if (adjustedPos > xfadeEnd)
 				adjustedPos -= xfadeBufferSize;
 			
-			double phase = (adjustedPos - xfadeStart) * invXfadeSize;
-			if (phase >= 0.0 && phase <= 1.0)
+			double xfadePosition = adjustedPos - xfadeStart;
+			auto xfadePhase = (float)(xfadePosition * invXfadeSize);
+			if (xfadePhase >= 0.0f && xfadePhase <= 1.0f)
 			{
 				float xfadeFrame[2];
-				device->ReadFrame()
+				device->ReadFrame((int)ModEuclid(xfadePosition, bufferSize), xfadeFrame);
+				
+				frame[0] = Helpers::Mix(frame[0], xfadeFrame[0], xfadePhase);
+				frame[1] = Helpers::Mix(frame[1], xfadeFrame[1], xfadePhase);
 			}
+*/
 
-			if (position )
+			float env = envPhase;
+			if (env >= 1.0f)
+				env = 2.0f - env;
 
-			*(++outputL) = frame[0];
-			*(++outputR) = frame[1];
+/*
+			float window = 1.0f - (float)(Helpers::FastCos(env * M_PI) + 1.0f) * 0.5f;
+			env += envSmooth * (window - env);
+*/
 
+			outputs[0][index] += frame[0] * env * gainL * 0.2f;
+			outputs[1][index] += frame[1] * env * gainR * 0.2f;
 
-			position += positionIncrement;
+			phase += phaseIncrement;
+			envPhase += envPhaseIncrement;
+
+			if (phase > (double)size)
+			{
+				active = false;
+				return;
+			}
 		}
 	}
 
-	void Barley::ReadFrame(double samplePos, float* frame)
+	inline void Barley::ReadFrame(double samplePos, float* frame)
 	{
-		auto samplePosFloor = floor(samplePos);
-		auto samplePosFract = samplePos - samplePosFloor;
+		double samplePosFloor = floor(samplePos);
+		double samplePosFract = samplePos - samplePosFloor;
 		
-		auto leftIndex = (int)samplePosFloor;
+		int leftIndex = (int)samplePosFloor;
 		int rightIndex = leftIndex + 1;
 		
 		for (auto ch = 0; ch < 2; ++ch)
 		{
-			auto left = buffer[leftIndex*2 + ch];
-			auto right = rightIndex < bufferSize ? buffer[rightIndex*2 + ch] : 0.0f;
+			float left = buffer[leftIndex * 2 + ch];
+			float right = rightIndex < bufferSize ? buffer[rightIndex * 2 + ch] : 0.0f;
 			frame[ch] = (float)((double)left * (1.0 - samplePosFract) + (double)right * samplePosFract);
 		}
 	}
@@ -240,13 +275,5 @@ namespace WaveSabreCore
 	void Barley::BarleyVoice::Run(double songPosition, float **outputs, int numSamples)
 	{
 		device->activeVoices[device->activeVoiceCount++] = this;
-	}
-
-	void Barley::BarleyVoice::NoteOn(int note, int velocity, float detune, float pan)
-	{
-	}
-
-	void Barley::BarleyVoice::NoteOff()
-	{
 	}
 }
