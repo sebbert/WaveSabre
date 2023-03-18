@@ -32,6 +32,7 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Harvester.h
 	include/WaveSabreCore/Washington.h
 	include/WaveSabreCore/Barley.h
+	include/WaveSabreCore/Vectron.h
 	include/WaveSabreCore/Deprecated/Thunder.h
 	src/Adultery.cpp
 	src/AllPass.cpp
@@ -63,6 +64,7 @@ add_library(WaveSabreCore
 	src/Harvester.cpp
 	src/Washington.cpp
 	src/Barley.cpp
+	src/Vectron.cpp
 	src/Deprecated/Thunder.cpp)
 
 add_compile_definitions(TEST)

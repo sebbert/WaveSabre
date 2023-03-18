@@ -28,6 +28,7 @@ namespace WaveSabrePlayerLib
 			Harvester,
 			Washington,
 			Barley,
+			Vectron,
 		};
 
 		typedef WaveSabreCore::Device *(*DeviceFactory)(DeviceId);

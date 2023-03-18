@@ -24,6 +24,7 @@ WaveSabreCore::Device *SongFactory(SongRenderer::DeviceId id)
 	case SongRenderer::DeviceId::Harvester: return new WaveSabreCore::Harvester();
 	case SongRenderer::DeviceId::Washington: return new WaveSabreCore::Washington();
 	case SongRenderer::DeviceId::Barley: return new WaveSabreCore::Barley();
+	case SongRenderer::DeviceId::Vectron: return new WaveSabreCore::Vectron();
 	}
 	return nullptr;
 }

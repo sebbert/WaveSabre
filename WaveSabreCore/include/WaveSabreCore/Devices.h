@@ -17,6 +17,7 @@
 #include "Harvester.h"
 #include "Washington.h"
 #include "Barley.h"
+#include "Vectron.h"
 
 #include "Deprecated/Thunder.h"
 
