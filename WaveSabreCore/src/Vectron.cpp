@@ -5,51 +5,59 @@
 
 namespace WaveSabreCore
 {
-	constexpr static float yRange = 8;
-
 	Vectron::Vectron()
 		: SynthDevice((int)ParamIndices::NumParams)
 	{
 		for (int i = 0; i < maxVoices; i++) voices[i] = new VectronVoice(this);
 
-		osc1X = 0.5f;
-		osc1Y = 0.5f;
+		osc1.X.Value = 0.5f;
+		osc1.X.Env1Amt = 0.0f;
+		osc1.X.Env2Amt = 0.0f;
 
-		osc1AmpAttack = 1.0f;
-		osc1AmpDecay = 5.0f;
-		osc1AmpSustain = 0.75f;
-		osc1AmpRelease = 1.5f;
+		osc1.Y.Value = 0.0f;
+		osc1.Y.Env1Amt = 0.0f;
+		osc1.Y.Env2Amt = 0.0f;
 
-		osc1YAttack = 1.0f;
-		osc1YDecay = 5.0f;
-		osc1YSustain = 0.75f;
-		osc1YRelease = 1.5f;
+		gain.Value = 0.0f;
+		gain.Env1Amt = 0.8f; // Env1 controls gain
+		gain.Env2Amt = 0.0f;
 
-		osc1YEnvAmt = 0.0f;
+		env1.Attack = 1.0f;
+		env1.Decay = 5.0f;
+		env1.Sustain = 0.5f;
+		env1.Release = 1.5f;
 
-		masterLevel = 0.8f;
+		env2.Attack = 1.0f;
+		env2.Decay = 5.0f;
+		env2.Sustain = 0.5f;
+		env2.Release = 1.5f;
 	}
 
 	void Vectron::SetParam(int index, float value)
 	{
 		switch ((ParamIndices)index)
 		{
-		case ParamIndices::Osc1X: osc1X = value; break;
-		case ParamIndices::Osc1Y: osc1Y = value * (2 * yRange) - yRange; break;
-		
-		case ParamIndices::Osc1AmpAttack: osc1AmpAttack = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Osc1AmpDecay: osc1AmpDecay = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Osc1AmpSustain: osc1AmpSustain = value; break;
-		case ParamIndices::Osc1AmpRelease: osc1AmpRelease = Helpers::ScalarToEnvValue(value); break;
-		
-		case ParamIndices::Osc1YAttack: osc1YAttack = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Osc1YDecay: osc1YDecay = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Osc1YSustain: osc1YSustain = value; break;
-		case ParamIndices::Osc1YRelease: osc1YRelease = Helpers::ScalarToEnvValue(value); break;
+		case ParamIndices::Osc1X: osc1.X.Value = value; break;
+		case ParamIndices::Osc1XEnv1Amt: osc1.X.Env1Amt = Helpers::UnitToSigned(value); break;
+		case ParamIndices::Osc1XEnv2Amt: osc1.X.Env2Amt = Helpers::UnitToSigned(value); break;
 
-		case ParamIndices::Osc1YEnvAmt: osc1YEnvAmt = (value - 0.5) * 2 * yRange; break;
+		case ParamIndices::Osc1Y: osc1.Y.Value = value; break;
+		case ParamIndices::Osc1YEnv1Amt: osc1.Y.Env1Amt = Helpers::UnitToSigned(value); break;
+		case ParamIndices::Osc1YEnv2Amt: osc1.Y.Env2Amt = Helpers::UnitToSigned(value); break;
 
-		case ParamIndices::MasterLevel: masterLevel = value; break;
+		case ParamIndices::Gain: gain.Value = value; break;
+		case ParamIndices::GainEnv1Amt: gain.Env1Amt = Helpers::UnitToSigned(value); break;
+		case ParamIndices::GainEnv2Amt: gain.Env2Amt = Helpers::UnitToSigned(value); break;
+
+		case ParamIndices::Env1Attack: env1.Attack = Helpers::ScalarToEnvValue(value); break;
+		case ParamIndices::Env1Decay: env1.Decay = Helpers::ScalarToEnvValue(value); break;
+		case ParamIndices::Env1Sustain: env1.Sustain = value; break;
+		case ParamIndices::Env1Release: env1.Release = Helpers::ScalarToEnvValue(value); break;
+
+		case ParamIndices::Env2Attack: env2.Attack = Helpers::ScalarToEnvValue(value); break;
+		case ParamIndices::Env2Decay: env2.Decay = Helpers::ScalarToEnvValue(value); break;
+		case ParamIndices::Env2Sustain: env2.Sustain = value; break;
+		case ParamIndices::Env2Release: env2.Release = Helpers::ScalarToEnvValue(value); break;
 		}
 	}
 
@@ -57,26 +65,30 @@ namespace WaveSabreCore
 	{
 		switch ((ParamIndices)index)
 		{
-		case ParamIndices::Osc1X: return osc1X;
-		case ParamIndices::Osc1Y: return (osc1Y + yRange) / (2 * yRange);
+		case ParamIndices::Osc1X: return osc1.X.Value;
+		case ParamIndices::Osc1XEnv1Amt: return Helpers::SignedToUnit(osc1.X.Env1Amt);
+		case ParamIndices::Osc1XEnv2Amt: return Helpers::SignedToUnit(osc1.X.Env2Amt);
 
-		case ParamIndices::Osc1AmpAttack: return Helpers::EnvValueToScalar(osc1AmpAttack);
-		case ParamIndices::Osc1AmpDecay: return Helpers::EnvValueToScalar(osc1AmpDecay);
-		case ParamIndices::Osc1AmpSustain: return osc1AmpSustain;
-		case ParamIndices::Osc1AmpRelease: return Helpers::EnvValueToScalar(osc1AmpRelease);
+		case ParamIndices::Osc1Y: return osc1.Y.Value;
+		case ParamIndices::Osc1YEnv1Amt: return Helpers::SignedToUnit(osc1.Y.Env1Amt);
+		case ParamIndices::Osc1YEnv2Amt: return Helpers::SignedToUnit(osc1.Y.Env2Amt);
 
-		case ParamIndices::Osc1YAttack: return Helpers::EnvValueToScalar(osc1YAttack);
-		case ParamIndices::Osc1YDecay: return Helpers::EnvValueToScalar(osc1YDecay);
-		case ParamIndices::Osc1YSustain: return osc1YSustain;
-		case ParamIndices::Osc1YRelease: return Helpers::EnvValueToScalar(osc1YRelease);
+		case ParamIndices::Gain: return gain.Value;
+		case ParamIndices::GainEnv1Amt: return Helpers::SignedToUnit(gain.Env1Amt);
+		case ParamIndices::GainEnv2Amt: return Helpers::SignedToUnit(gain.Env2Amt);
 
-		case ParamIndices::Osc1YEnvAmt: return osc1YEnvAmt / (2 * yRange) + 0.5;
+		case ParamIndices::Env1Attack: return Helpers::EnvValueToScalar(env1.Attack);
+		case ParamIndices::Env1Decay: return Helpers::EnvValueToScalar(env1.Decay);
+		case ParamIndices::Env1Sustain: return env1.Sustain;
+		case ParamIndices::Env1Release: return Helpers::EnvValueToScalar(env1.Release);
 
-		case ParamIndices::MasterLevel: return masterLevel;
-
-		default: return 0.0f;
+		case ParamIndices::Env2Attack: return Helpers::EnvValueToScalar(env2.Attack);
+		case ParamIndices::Env2Decay: return Helpers::EnvValueToScalar(env2.Decay);
+		case ParamIndices::Env2Sustain: return env2.Sustain;
+		case ParamIndices::Env2Release: return Helpers::EnvValueToScalar(env2.Release);
 		}
 	}
+
 
 	Vectron::VectronVoice::VectronVoice(Vectron *vectron)
 	{
@@ -88,24 +100,30 @@ namespace WaveSabreCore
 		return vectron;
 	}
 
-	inline float Vectron::Oscillator::Next(double phaseIncrement)
+	inline float Vectron::ModParam::GetValue(const Vectron::Mod *mod) const
 	{
-		float y = Y + YEnvAmt * YEnv.GetValue();
+		float sum = Value;
+		sum += mod->Env1 * Env1Amt;
+		sum += mod->Env2 * Env2Amt;
+		return Helpers::Clamp(sum, 0.0f, 1.0f);
+	}
 
-		float distPhase;
-
-		if (Phase <= (double)X)
+	inline float Vectron::Oscillator::Next(double phaseIncrement, const Mod *mod)
+	{
+		double x = X.GetValue(mod);
+		double y = Y.GetValue(mod) * 4.0;
+	
+		double distPhase;
+		if (Phase <= x)
 		{
-			distPhase = (y * Phase) / X;
+			distPhase = (y * Phase) / x;
 		}
 		else 
 		{
-			distPhase = (1 - y) * ((Phase - X) / (1.0f - X)) + y;
+			distPhase = (1.0 - y) * (Phase - x) / (1.0 - x) + y;
 		}
 
-		float output = -Helpers::FastCos(2 * M_PI * distPhase);
-
-		output *= AmpEnv.GetValue();
+		float output = (float) -Helpers::FastCos(2 * M_PI * distPhase);
 
 		Phase += phaseIncrement;
 		if (Phase >= 1.0)
@@ -113,33 +131,40 @@ namespace WaveSabreCore
 			Phase -= 1.0;
 		}
 
-		AmpEnv.Next();
-		YEnv.Next();
-
 		return output;
 	}
 
 	void Vectron::VectronVoice::Run(double songPosition, float **outputs, int numSamples)
 	{
-		float masterLevel = vectron->masterLevel;
+		Mod mod;
 
-		double freq = Helpers::NoteToFreq(Note);
-		double phaseIncrement = freq / Helpers::CurrentSampleRate;
-
-		float gainLeft = masterLevel * Helpers::PanToScalarLeft(Pan);
-		float gainRight = masterLevel * Helpers::PanToScalarRight(Pan);
-
+		double invSampleRate = 1.0 / Helpers::CurrentSampleRate;
+		
 		for (auto i = 0; i < numSamples; ++i)
 		{
-			auto osc1Output = osc1.Next(phaseIncrement);
+			double note = GetNote();
+			double freq = Helpers::NoteToFreq(note);
+			double phaseIncrement = freq * invSampleRate;
 
-			outputs[0][i] += osc1Output * gainLeft;
-			outputs[1][i] += osc1Output * gainRight;
-		}
+			mod.Env1 = env1.GetValue();
+			mod.Env2 = env2.GetValue();
 
-		if (osc1.AmpEnv.State == EnvelopeState::Finished)
-		{
-			IsOn = false;
+			float osc1Output = osc1.Next(phaseIncrement, &mod);
+
+			float mix = osc1Output * gain.GetValue(&mod);
+
+			outputs[0][i] += mix * panLeft;
+			outputs[1][i] += mix * panRight;
+
+			env1.Next();
+			env2.Next();
+
+			if (env1.State == EnvelopeState::Finished &&
+				env2.State == EnvelopeState::Finished)
+			{
+				IsOn = false;
+				break;
+			}
 		}
 	}
 
@@ -147,29 +172,24 @@ namespace WaveSabreCore
 	{
 		Voice::NoteOn(note, velocity, detune, pan);
 
-		osc1.Phase = (double)Helpers::RandFloat() * 0.5 + 0.5;
+		panLeft = Helpers::PanToScalarLeft(Pan);
+		panRight = Helpers::PanToScalarRight(Pan);
 
-		osc1.X = vectron->osc1X;
-		osc1.Y = vectron->osc1Y;
+		osc1 = vectron->osc1;
+		osc1.Phase = Helpers::SignedToUnit((double)Helpers::RandFloat());
 
-		osc1.YEnvAmt = vectron->osc1YEnvAmt;
+		gain = vectron->gain;
 
-		osc1.AmpEnv.Attack = vectron->osc1AmpAttack;
-		osc1.AmpEnv.Decay = vectron->osc1AmpDecay;
-		osc1.AmpEnv.Sustain = vectron->osc1AmpSustain;
-		osc1.AmpEnv.Release = vectron->osc1AmpRelease;
-		osc1.AmpEnv.Trigger();
+		env1 = vectron->env1;
+		env1.Trigger();
 
-		osc1.YEnv.Attack = vectron->osc1YAttack;
-		osc1.YEnv.Decay = vectron->osc1YDecay;
-		osc1.YEnv.Sustain = vectron->osc1YSustain;
-		osc1.YEnv.Release = vectron->osc1YRelease;
-		osc1.YEnv.Trigger();
+		env2 = vectron->env2;
+		env2.Trigger();
 	}
 
 	void Vectron::VectronVoice::NoteOff()
 	{
-		osc1.AmpEnv.Off();
-		osc1.YEnv.Off();
+		env1.Off();
+		env2.Off();
 	}
 }

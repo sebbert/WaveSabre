@@ -45,6 +45,26 @@ namespace WaveSabreCore
 			return x * x;
 		}
 
+		static inline double UnitToSigned(double x)
+		{
+			return x * 2.0 - 1.0;
+		}
+
+		static inline double SignedToUnit(double x)
+		{
+			return x * 0.5 + 0.5;
+		}
+
+		static inline float UnitToSigned(float x)
+		{
+			return x * 2.0f - 1.0f;
+		}
+
+		static inline float SignedToUnit(float x)
+		{
+			return x * 0.5f + 0.5f;
+		}
+
 		static double FastCos(double x);
 		static double FastSin(double x);
 
