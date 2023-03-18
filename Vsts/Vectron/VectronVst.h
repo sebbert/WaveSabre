@@ -11,6 +11,7 @@ public:
 
 	virtual void getParameterName(VstInt32 index, char *text);
 
+
 	virtual bool getEffectName(char *name);
 	virtual bool getProductString(char *text);
 };

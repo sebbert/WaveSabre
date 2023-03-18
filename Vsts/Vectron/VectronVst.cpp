@@ -16,26 +16,32 @@ VectronVst::VectronVst(audioMasterCallback audioMaster)
 	setEditor(new VectronEditor(this));
 }
 
+
 static const char* getParameterNameImpl(Vectron::ParamIndices index)
 {
 	switch (index)
 	{
 	case Vectron::ParamIndices::Osc1X: return "O1 X";
+	case Vectron::ParamIndices::Osc1XEnv1Amt: return "O1 X E1";
+	case Vectron::ParamIndices::Osc1XEnv2Amt: return "O1 X E2";
+	
 	case Vectron::ParamIndices::Osc1Y: return "O1 Y";
+	case Vectron::ParamIndices::Osc1YEnv1Amt: return "O1 Y E1";
+	case Vectron::ParamIndices::Osc1YEnv2Amt: return "O1 Y E2";
 
-	case Vectron::ParamIndices::Osc1AmpAttack: return "O1 Amp A";
-	case Vectron::ParamIndices::Osc1AmpDecay: return "O1 Amp D";
-	case Vectron::ParamIndices::Osc1AmpSustain: return "O1 Amp S";
-	case Vectron::ParamIndices::Osc1AmpRelease: return "O1 Amp R";
+	case Vectron::ParamIndices::Gain: return "Gain";
+	case Vectron::ParamIndices::GainEnv1Amt: return "Gain E1";
+	case Vectron::ParamIndices::GainEnv2Amt: return "Gain E2";
 
-	case Vectron::ParamIndices::Osc1YAttack: return "O1 Y A";
-	case Vectron::ParamIndices::Osc1YDecay: return "O1 Y D";
-	case Vectron::ParamIndices::Osc1YSustain: return "O1 Y S";
-	case Vectron::ParamIndices::Osc1YRelease: return "O1 Y R";
+	case Vectron::ParamIndices::Env1Attack: return "E1 Atk";
+	case Vectron::ParamIndices::Env1Decay: return "E1 Dcy";
+	case Vectron::ParamIndices::Env1Sustain: return "E1 Sus";
+	case Vectron::ParamIndices::Env1Release: return "E1 Rls";
 
-	case Vectron::ParamIndices::Osc1YEnvAmt: return "O1 Y Amt";
-
-	case Vectron::ParamIndices::MasterLevel: return "Mstr Lvl";
+	case Vectron::ParamIndices::Env2Attack: return "E2 Atk";
+	case Vectron::ParamIndices::Env2Decay: return "E2 Dcy";
+	case Vectron::ParamIndices::Env2Sustain: return "E2 Sus";
+	case Vectron::ParamIndices::Env2Release: return "E2 Rls";
 
 	default: return "???";
 	}
