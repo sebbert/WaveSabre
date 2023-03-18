@@ -27,6 +27,7 @@ namespace WaveSabrePlayerLib
 			Specimen,
 			Washington,
 			Barley,
+			Vectron,
 		};
 
 		typedef WaveSabreCore::Device *(*DeviceFactory)(DeviceId);
