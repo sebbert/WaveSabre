@@ -11,14 +11,23 @@ namespace WaveSabreCore
 	public:
 		enum class ParamIndices
 		{
-			Osc1X, Osc1XEnv1Amt, Osc1XEnv2Amt,
-			Osc1Y, Osc1YEnv1Amt, Osc1YEnv2Amt,
+			ModScale,   ModScaleEnv1Amt,   ModScaleEnv2Amt,
+			ModOffset,  ModOffsetEnv1Amt,  ModOffsetEnv2Amt,
 
-			Gain, GainEnv1Amt, GainEnv2Amt,
+			ModXScale,  ModXScaleEnv1Amt,  ModXScaleEnv2Amt,
+			ModXOffset, ModXOffsetEnv1Amt, ModXOffsetEnv2Amt,
+			ModXDetune, ModXDetuneEnv1Amt, ModXDetuneEnv2Amt,
+
+			ModYScale,  ModYScaleEnv1Amt,  ModYScaleEnv2Amt,
+			ModYOffset, ModYOffsetEnv1Amt, ModYOffsetEnv2Amt,
+			ModYDetune, ModYDetuneEnv1Amt, ModYDetuneEnv2Amt,
+
+			Osc1Offset, Osc1OffsetEnv1Amt, Osc1OffsetEnv2Amt,
+			Osc1Mod,    Osc1ModEnv1Amt,    Osc1ModEnv2Amt,
 
 			Env1Attack, Env1Decay, Env1Sustain, Env1Release,
 			Env2Attack, Env2Decay, Env2Sustain, Env2Release,
-			
+
 			NumParams,
 		};
 
@@ -27,7 +36,7 @@ namespace WaveSabreCore
 		virtual void SetParam(int index, float value);
 		virtual float GetParam(int index) const;
 
-		struct Mod
+		struct Modulation
 		{
 			float Env1, Env2;
 		};
@@ -35,29 +44,38 @@ namespace WaveSabreCore
 		class ModParam
 		{
 		public:
-			enum class ParamIndices
-			{
-				Value,
-				Env1Amt, Env2Amt,
-
-				NumParams,
-			};
-
-			inline float GetValue(const Mod* mod) const;
+			inline float GetValue(const Modulation *mod) const;
 
 			float Value;
 			float Env1Amt;
 			float Env2Amt;
 		};
 
+		class ModOscillator
+		{
+		public:
+			double Next(double *phaseVar, double note, const Modulation *mod);
+
+			ModParam Scale, Offset, Detune;
+
+			double Phase;
+		};
+
+		class PhaseModulator
+		{
+		public:
+			ModParam Scale, Offset;
+
+			ModOscillator X, Y;
+		};
+
 		class Oscillator
 		{
 		public:
-			inline float Next(double phaseIncrement, const Mod *mod);
+			inline float Next(double *phaseVar, double note, double modX, double modY, const Modulation *mod);
 
-			double Phase;
-
-			ModParam X, Y;
+			ModParam Offset;
+			ModParam Mod;
 		};
 
 		class VectronVoice : public Voice
@@ -76,16 +94,13 @@ namespace WaveSabreCore
 
 			float panLeft, panRight;
 
-			Oscillator osc1;
-			ModParam gain;
-
+			double xModPhase, yModPhase, osc1Phase;
 			Envelope env1, env2;
 		};
 
 protected:
+		PhaseModulator phaseMod;
 		Oscillator osc1;
-		ModParam gain;
-
 		Envelope env1, env2;
 	};
 }

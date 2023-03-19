@@ -3,6 +3,39 @@
 
 #include <math.h>
 
+#define SET_MOD_PARAM(INDEX, PARAM) \
+	case INDEX:          PARAM.Value = value; \
+	case INDEX##Env1Amt: PARAM.Env1Amt = Helpers::UnitToSigned(value); \
+	case INDEX##Env2Amt: PARAM.Env2Amt = Helpers::UnitToSigned(value);
+
+#define GET_MOD_PARAM(INDEX, PARAM) \
+	case INDEX:          return PARAM.Value; \
+	case INDEX##Env1Amt: return Helpers::SignedToUnit(PARAM.Env1Amt); \
+	case INDEX##Env2Amt: return Helpers::SignedToUnit(PARAM.Env2Amt);
+
+
+#define SET_ADSR(INDEX, ENV) \
+	case INDEX##Attack:  ENV.Attack  = Helpers::ScalarToEnvValue(value); break; \
+	case INDEX##Decay:   ENV.Decay   = Helpers::ScalarToEnvValue(value); break; \
+	case INDEX##Sustain: ENV.Sustain = value; break; \
+	case INDEX##Release: ENV.Release = Helpers::ScalarToEnvValue(value); break;
+
+#define GET_ADSR(INDEX, ENV) \
+	case INDEX##Attack:  return Helpers::EnvValueToScalar(ENV.Attack); \
+	case INDEX##Decay:   return Helpers::EnvValueToScalar(ENV.Decay); \
+	case INDEX##Sustain: return ENV.Sustain; \
+	case INDEX##Release: return Helpers::EnvValueToScalar(ENV.Release);
+
+static double IncPhase(double phase, double increment)
+{
+	phase += increment;
+	if (phase >= 1.0)
+	{
+		phase -= 1.0;
+	}
+	return phase;
+}
+
 namespace WaveSabreCore
 {
 	Vectron::Vectron()
@@ -10,17 +43,49 @@ namespace WaveSabreCore
 	{
 		for (int i = 0; i < maxVoices; i++) voices[i] = new VectronVoice(this);
 
-		osc1.X.Value = 0.5f;
-		osc1.X.Env1Amt = 0.0f;
-		osc1.X.Env2Amt = 0.0f;
+		phaseMod.Scale.Value = 0.0f;
+		phaseMod.Scale.Env1Amt = 0.0f;
+		phaseMod.Scale.Env2Amt = 0.0f;
 
-		osc1.Y.Value = 0.0f;
-		osc1.Y.Env1Amt = 0.0f;
-		osc1.Y.Env2Amt = 0.0f;
+		phaseMod.Offset.Value = 0.0f;
+		phaseMod.Offset.Env1Amt = 0.0f;
+		phaseMod.Offset.Env2Amt = 0.0f;
 
-		gain.Value = 0.0f;
-		gain.Env1Amt = 0.8f; // Env1 controls gain
-		gain.Env2Amt = 0.0f;
+
+		phaseMod.X.Scale.Value = 0.0f;
+		phaseMod.X.Scale.Env1Amt = 0.0f;
+		phaseMod.X.Scale.Env2Amt = 0.0f;
+
+		phaseMod.X.Offset.Value = 0.0f;
+		phaseMod.X.Offset.Env1Amt = 0.0f;
+		phaseMod.X.Offset.Env2Amt = 0.0f;
+
+		phaseMod.X.Detune.Value = 0.5f;
+		phaseMod.X.Detune.Env1Amt = 0.0f;
+		phaseMod.X.Detune.Env2Amt = 0.0f;
+
+
+		phaseMod.Y.Scale.Value = 0.0f;
+		phaseMod.Y.Scale.Env1Amt = 0.0f;
+		phaseMod.Y.Scale.Env2Amt = 0.0f;
+
+		phaseMod.Y.Offset.Value = 0.0f;
+		phaseMod.Y.Offset.Env1Amt = 0.0f;
+		phaseMod.Y.Offset.Env2Amt = 0.0f;
+
+		phaseMod.Y.Detune.Value = 0.5f;
+		phaseMod.Y.Detune.Env1Amt = 0.0f;
+		phaseMod.Y.Detune.Env2Amt = 0.0f;
+
+
+		osc1.Offset.Value = 0.0f;
+		osc1.Offset.Env1Amt = 0.0f;
+		osc1.Offset.Env2Amt = 0.0f;
+
+		osc1.Mod.Value = 0.3f;
+		osc1.Mod.Env1Amt = 0.0f;
+		osc1.Mod.Env2Amt = 0.0f;
+
 
 		env1.Attack = 1.0f;
 		env1.Decay = 5.0f;
@@ -37,27 +102,22 @@ namespace WaveSabreCore
 	{
 		switch ((ParamIndices)index)
 		{
-		case ParamIndices::Osc1X: osc1.X.Value = value; break;
-		case ParamIndices::Osc1XEnv1Amt: osc1.X.Env1Amt = Helpers::UnitToSigned(value); break;
-		case ParamIndices::Osc1XEnv2Amt: osc1.X.Env2Amt = Helpers::UnitToSigned(value); break;
+		SET_MOD_PARAM(ParamIndices::ModScale, phaseMod.Scale)
+		SET_MOD_PARAM(ParamIndices::ModOffset, phaseMod.Offset)
 
-		case ParamIndices::Osc1Y: osc1.Y.Value = value; break;
-		case ParamIndices::Osc1YEnv1Amt: osc1.Y.Env1Amt = Helpers::UnitToSigned(value); break;
-		case ParamIndices::Osc1YEnv2Amt: osc1.Y.Env2Amt = Helpers::UnitToSigned(value); break;
+		SET_MOD_PARAM(ParamIndices::ModXScale, phaseMod.X.Scale)
+		SET_MOD_PARAM(ParamIndices::ModXOffset, phaseMod.X.Offset)
+		SET_MOD_PARAM(ParamIndices::ModXDetune, phaseMod.X.Detune)
 
-		case ParamIndices::Gain: gain.Value = value; break;
-		case ParamIndices::GainEnv1Amt: gain.Env1Amt = Helpers::UnitToSigned(value); break;
-		case ParamIndices::GainEnv2Amt: gain.Env2Amt = Helpers::UnitToSigned(value); break;
+		SET_MOD_PARAM(ParamIndices::ModYScale, phaseMod.Y.Scale)
+		SET_MOD_PARAM(ParamIndices::ModYOffset, phaseMod.Y.Offset)
+		SET_MOD_PARAM(ParamIndices::ModYDetune, phaseMod.Y.Detune)
 
-		case ParamIndices::Env1Attack: env1.Attack = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Env1Decay: env1.Decay = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Env1Sustain: env1.Sustain = value; break;
-		case ParamIndices::Env1Release: env1.Release = Helpers::ScalarToEnvValue(value); break;
+		SET_MOD_PARAM(ParamIndices::Osc1Offset, osc1.Offset)
+		SET_MOD_PARAM(ParamIndices::Osc1Mod, osc1.Mod)
 
-		case ParamIndices::Env2Attack: env2.Attack = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Env2Decay: env2.Decay = Helpers::ScalarToEnvValue(value); break;
-		case ParamIndices::Env2Sustain: env2.Sustain = value; break;
-		case ParamIndices::Env2Release: env2.Release = Helpers::ScalarToEnvValue(value); break;
+		SET_ADSR(ParamIndices::Env1, env1)
+		SET_ADSR(ParamIndices::Env2, env2)
 		}
 	}
 
@@ -65,30 +125,24 @@ namespace WaveSabreCore
 	{
 		switch ((ParamIndices)index)
 		{
-		case ParamIndices::Osc1X: return osc1.X.Value;
-		case ParamIndices::Osc1XEnv1Amt: return Helpers::SignedToUnit(osc1.X.Env1Amt);
-		case ParamIndices::Osc1XEnv2Amt: return Helpers::SignedToUnit(osc1.X.Env2Amt);
+		GET_MOD_PARAM(ParamIndices::ModScale, phaseMod.Scale)
+		GET_MOD_PARAM(ParamIndices::ModOffset, phaseMod.Offset)
 
-		case ParamIndices::Osc1Y: return osc1.Y.Value;
-		case ParamIndices::Osc1YEnv1Amt: return Helpers::SignedToUnit(osc1.Y.Env1Amt);
-		case ParamIndices::Osc1YEnv2Amt: return Helpers::SignedToUnit(osc1.Y.Env2Amt);
+		GET_MOD_PARAM(ParamIndices::ModXScale, phaseMod.X.Scale)
+		GET_MOD_PARAM(ParamIndices::ModXOffset, phaseMod.X.Offset)
+		GET_MOD_PARAM(ParamIndices::ModXDetune, phaseMod.X.Detune)
 
-		case ParamIndices::Gain: return gain.Value;
-		case ParamIndices::GainEnv1Amt: return Helpers::SignedToUnit(gain.Env1Amt);
-		case ParamIndices::GainEnv2Amt: return Helpers::SignedToUnit(gain.Env2Amt);
+		GET_MOD_PARAM(ParamIndices::ModYScale, phaseMod.Y.Scale)
+		GET_MOD_PARAM(ParamIndices::ModYOffset, phaseMod.Y.Offset)
+		GET_MOD_PARAM(ParamIndices::ModYDetune, phaseMod.Y.Detune)
 
-		case ParamIndices::Env1Attack: return Helpers::EnvValueToScalar(env1.Attack);
-		case ParamIndices::Env1Decay: return Helpers::EnvValueToScalar(env1.Decay);
-		case ParamIndices::Env1Sustain: return env1.Sustain;
-		case ParamIndices::Env1Release: return Helpers::EnvValueToScalar(env1.Release);
+		GET_MOD_PARAM(ParamIndices::Osc1Offset, osc1.Offset)
+		GET_MOD_PARAM(ParamIndices::Osc1Mod, osc1.Mod)
 
-		case ParamIndices::Env2Attack: return Helpers::EnvValueToScalar(env2.Attack);
-		case ParamIndices::Env2Decay: return Helpers::EnvValueToScalar(env2.Decay);
-		case ParamIndices::Env2Sustain: return env2.Sustain;
-		case ParamIndices::Env2Release: return Helpers::EnvValueToScalar(env2.Release);
+		GET_ADSR(ParamIndices::Env1, env1)
+		GET_ADSR(ParamIndices::Env2, env2)
 		}
 	}
-
 
 	Vectron::VectronVoice::VectronVoice(Vectron *vectron)
 	{
@@ -100,7 +154,7 @@ namespace WaveSabreCore
 		return vectron;
 	}
 
-	inline float Vectron::ModParam::GetValue(const Vectron::Mod *mod) const
+	inline float Vectron::ModParam::GetValue(const Vectron::Modulation *mod) const
 	{
 		float sum = Value;
 		sum += mod->Env1 * Env1Amt;
@@ -108,50 +162,71 @@ namespace WaveSabreCore
 		return Helpers::Clamp(sum, 0.0f, 1.0f);
 	}
 
-	inline float Vectron::Oscillator::Next(double phaseIncrement, const Mod *mod)
+	inline float Vectron::Oscillator::Next(double *phaseVar, double note, double modX, double modY, const Modulation *mod)
 	{
-		double x = X.GetValue(mod);
-		double y = Y.GetValue(mod) * 4.0;
+		double freq = 0.5 * Helpers::NoteToFreq(note);
+		double phaseIncrement = freq / Helpers::CurrentSampleRate;
+
+		double phaseModAmt = Mod.GetValue(mod);
+		double x = phaseModAmt * modX;
+		double y = phaseModAmt * modY * 8.0;
+
+		double phase = IncPhase(*phaseVar, Offset.GetValue(mod));
 	
-		double distPhase;
-		if (Phase <= x)
+		double phaseDist;
+		if (phase <= x)
 		{
-			distPhase = (y * Phase) / x;
+			phaseDist = (y * phase) / x;
 		}
 		else 
 		{
-			distPhase = (1.0 - y) * (Phase - x) / (1.0 - x) + y;
+			phaseDist = (1.0 - y) * (phase - x) / (1.0 - x) + y;
 		}
 
-		float output = (float) -Helpers::FastCos(2 * M_PI * distPhase);
+		float output = (float)-Helpers::FastCos(2 * M_PI * phaseDist);
 
-		Phase += phaseIncrement;
-		if (Phase >= 1.0)
-		{
-			Phase -= 1.0;
-		}
+		*phaseVar = IncPhase(*phaseVar, phaseIncrement);
+
+		return output;
+	}
+
+	inline double Vectron::ModOscillator::Next(double *phaseVar, double note, const Modulation *mod)
+	{
+		double detune = Helpers::UnitToSigned(Detune.GetValue(mod));
+		double freq = 0.5 * Helpers::NoteToFreq(note + detune);
+		double phaseIncrement = freq / Helpers::CurrentSampleRate;
+
+		double phase = *phaseVar + Offset.GetValue(mod);
+		double scale = Scale.GetValue(mod);
+
+		double output = scale * Helpers::SignedToUnit(Helpers::FastCos(2.0 * M_PI * phase));
+
+		*phaseVar = IncPhase(*phaseVar, phaseIncrement);
 
 		return output;
 	}
 
 	void Vectron::VectronVoice::Run(double songPosition, float **outputs, int numSamples)
 	{
-		Mod mod;
+		Modulation mod;
 
 		double invSampleRate = 1.0 / Helpers::CurrentSampleRate;
-		
+
 		for (auto i = 0; i < numSamples; ++i)
 		{
-			double note = GetNote();
-			double freq = Helpers::NoteToFreq(note);
-			double phaseIncrement = freq * invSampleRate;
-
 			mod.Env1 = env1.GetValue();
 			mod.Env2 = env2.GetValue();
 
-			float osc1Output = osc1.Next(phaseIncrement, &mod);
+			double note = GetNote();
 
-			float mix = osc1Output * gain.GetValue(&mod);
+			double modScale = vectron->phaseMod.Scale.GetValue(&mod);
+			double modOffset = vectron->phaseMod.Offset.GetValue(&mod);
+
+			double modX = vectron->phaseMod.X.Next(&xModPhase, note, &mod);
+			double modY = vectron->phaseMod.Y.Next(&yModPhase, note, &mod);
+			float osc1Output = vectron->osc1.Next(&osc1Phase, note, modX, modY, &mod);
+
+			float mix = osc1Output * mod.Env1;
 
 			outputs[0][i] += mix * panLeft;
 			outputs[1][i] += mix * panRight;
@@ -175,10 +250,9 @@ namespace WaveSabreCore
 		panLeft = Helpers::PanToScalarLeft(Pan);
 		panRight = Helpers::PanToScalarRight(Pan);
 
-		osc1 = vectron->osc1;
-		osc1.Phase = Helpers::SignedToUnit((double)Helpers::RandFloat());
-
-		gain = vectron->gain;
+		xModPhase = Helpers::SignedToUnit((double)Helpers::RandFloat());
+		yModPhase = Helpers::SignedToUnit((double)Helpers::RandFloat());
+		osc1Phase = Helpers::SignedToUnit((double)Helpers::RandFloat());
 
 		env1 = vectron->env1;
 		env1.Trigger();

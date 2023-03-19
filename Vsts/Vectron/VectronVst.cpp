@@ -4,6 +4,13 @@
 #include <WaveSabreCore.h>
 using namespace WaveSabreCore;
 
+
+#define GET_MOD_PARAM_NAME(INDEX, NAME)  \
+	case INDEX:          return (NAME); \
+	case INDEX##Env1Amt: return (NAME "E1"); \
+	case INDEX##Env2Amt: return (NAME "E2");
+
+
 AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 {
 	Helpers::Init();
@@ -16,22 +23,23 @@ VectronVst::VectronVst(audioMasterCallback audioMaster)
 	setEditor(new VectronEditor(this));
 }
 
-
 static const char* getParameterNameImpl(Vectron::ParamIndices index)
 {
 	switch (index)
 	{
-	case Vectron::ParamIndices::Osc1X: return "O1 X";
-	case Vectron::ParamIndices::Osc1XEnv1Amt: return "O1 X E1";
-	case Vectron::ParamIndices::Osc1XEnv2Amt: return "O1 X E2";
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModScale, "PmScl")
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModOffset, "PmOfs")
 	
-	case Vectron::ParamIndices::Osc1Y: return "O1 Y";
-	case Vectron::ParamIndices::Osc1YEnv1Amt: return "O1 Y E1";
-	case Vectron::ParamIndices::Osc1YEnv2Amt: return "O1 Y E2";
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModXScale, "PmXScl")
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModXOffset, "PmXOfs")
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModXDetune, "PmXDet")
+	
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModYScale, "PmYScl")
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModYOffset, "PmYOfs")
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::ModYDetune, "PmYDet")
 
-	case Vectron::ParamIndices::Gain: return "Gain";
-	case Vectron::ParamIndices::GainEnv1Amt: return "Gain E1";
-	case Vectron::ParamIndices::GainEnv2Amt: return "Gain E2";
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::Osc1Offset, "O1Ofs")
+	GET_MOD_PARAM_NAME(Vectron::ParamIndices::Osc1Mod, "O1Mod")
 
 	case Vectron::ParamIndices::Env1Attack: return "E1 Atk";
 	case Vectron::ParamIndices::Env1Decay: return "E1 Dcy";
