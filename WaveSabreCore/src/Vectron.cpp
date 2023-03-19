@@ -162,12 +162,13 @@ namespace WaveSabreCore
 		return Helpers::Clamp(sum, 0.0f, 1.0f);
 	}
 
-	inline float Vectron::Oscillator::Next(double *phaseVar, double note, double modX, double modY, const Modulation *mod)
+	float Vectron::Oscillator::Next(double *phaseVar, double note, double modX, double modY, const Modulation *mod) const
 	{
 		double freq = 0.5 * Helpers::NoteToFreq(note);
 		double phaseIncrement = freq / Helpers::CurrentSampleRate;
 
 		double phaseModAmt = Mod.GetValue(mod);
+		double phaseModXAmt = Mod.GetValue(mod);
 		double x = phaseModAmt * modX;
 		double y = phaseModAmt * modY * 8.0;
 
@@ -190,28 +191,42 @@ namespace WaveSabreCore
 		return output;
 	}
 
-	inline double Vectron::ModOscillator::Next(double *phaseVar, double note, const Modulation *mod)
+	double Vectron::ModOscillator::Next(
+		double *phaseVar,
+		double note,
+		double modScale,
+		double modOffset,
+		const Modulation *mod
+	) const
 	{
-		double detune = Helpers::UnitToSigned(Detune.GetValue(mod));
-		double freq = 0.5 * Helpers::NoteToFreq(note + detune);
+		double detune = Helpers::UnitToSigned(Detune.GetValue(mod)) * 24;
+		double freq = Helpers::NoteToFreq(note + detune);
 		double phaseIncrement = freq / Helpers::CurrentSampleRate;
 
-		double phase = *phaseVar + Offset.GetValue(mod);
-		double scale = Scale.GetValue(mod);
+		double axisScale = Scale.GetValue(mod) * 3 + 1;
+		double axisOffset = Offset.GetValue(mod);
 
-		double output = scale * Helpers::SignedToUnit(Helpers::FastCos(2.0 * M_PI * phase));
+		double phase = modOffset + axisScale * (*phaseVar + axisOffset);
+
+		double output = Helpers::SignedToUnit(Helpers::FastCos(modScale * phase));
 
 		*phaseVar = IncPhase(*phaseVar, phaseIncrement);
 
 		return output;
 	}
 
+	void Vectron::PhaseModulator::Next(Vectron::PhaseModulator::State *state, double note, const Modulation *mod) const
+	{
+		double modScale = Helpers::Mix(1.0 / 3.0, 2.0 * M_PI, Scale.GetValue(mod));
+		double modOffset = Offset.GetValue(mod);
+
+		state->OutputX = X.Next(&state->PhaseX, note, modScale, modOffset, mod);
+		state->OutputY = Y.Next(&state->PhaseY, note, modScale, 0.0, mod);
+	}
+
 	void Vectron::VectronVoice::Run(double songPosition, float **outputs, int numSamples)
 	{
 		Modulation mod;
-
-		double invSampleRate = 1.0 / Helpers::CurrentSampleRate;
-
 		for (auto i = 0; i < numSamples; ++i)
 		{
 			mod.Env1 = env1.GetValue();
@@ -219,11 +234,10 @@ namespace WaveSabreCore
 
 			double note = GetNote();
 
-			double modScale = vectron->phaseMod.Scale.GetValue(&mod);
-			double modOffset = vectron->phaseMod.Offset.GetValue(&mod);
+			vectron->phaseMod.Next(&phaseModState, note, &mod);
+			double modX = phaseModState.OutputX;
+			double modY = phaseModState.OutputY;
 
-			double modX = vectron->phaseMod.X.Next(&xModPhase, note, &mod);
-			double modY = vectron->phaseMod.Y.Next(&yModPhase, note, &mod);
 			float osc1Output = vectron->osc1.Next(&osc1Phase, note, modX, modY, &mod);
 
 			float mix = osc1Output * mod.Env1;
@@ -250,8 +264,8 @@ namespace WaveSabreCore
 		panLeft = Helpers::PanToScalarLeft(Pan);
 		panRight = Helpers::PanToScalarRight(Pan);
 
-		xModPhase = Helpers::SignedToUnit((double)Helpers::RandFloat());
-		yModPhase = Helpers::SignedToUnit((double)Helpers::RandFloat());
+		phaseModState.PhaseX = 0.0;
+		phaseModState.PhaseY = 0.0;
 		osc1Phase = Helpers::SignedToUnit((double)Helpers::RandFloat());
 
 		env1 = vectron->env1;
