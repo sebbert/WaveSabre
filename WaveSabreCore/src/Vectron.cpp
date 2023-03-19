@@ -43,7 +43,7 @@ namespace WaveSabreCore
 	{
 		for (int i = 0; i < maxVoices; i++) voices[i] = new VectronVoice(this);
 
-		phaseMod.Scale.Value = 0.0f;
+		phaseMod.Scale.Value = 0.5f;
 		phaseMod.Scale.Env1Amt = 0.0f;
 		phaseMod.Scale.Env2Amt = 0.0f;
 
@@ -52,7 +52,7 @@ namespace WaveSabreCore
 		phaseMod.Offset.Env2Amt = 0.0f;
 
 
-		phaseMod.X.Scale.Value = 0.0f;
+		phaseMod.X.Scale.Value = 0.5f;
 		phaseMod.X.Scale.Env1Amt = 0.0f;
 		phaseMod.X.Scale.Env2Amt = 0.0f;
 
@@ -65,7 +65,7 @@ namespace WaveSabreCore
 		phaseMod.X.Detune.Env2Amt = 0.0f;
 
 
-		phaseMod.Y.Scale.Value = 0.0f;
+		phaseMod.Y.Scale.Value = 0.5f;
 		phaseMod.Y.Scale.Env1Amt = 0.0f;
 		phaseMod.Y.Scale.Env2Amt = 0.0f;
 
