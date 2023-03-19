@@ -4,31 +4,6 @@ using namespace std;
 
 namespace WaveSabreVstLib
 {
-	const int BaseSize = 20;
-	const int LeftMargin = BaseSize;
-
-	const int TitleTopMargin = BaseSize / 2;
-	const int TitleAreaHeight = BaseSize * 2;
-
-	const int RowHeight = BaseSize * 3;
-
-	const int KnobWidth = 55;
-	const int KnobKnobOffset = 12;
-	const int KnobCaptionWidth = 100;
-	const int KnobCaptionOffset = 30;
-
-	const int ButtonWidth = 55;
-	const int ButtonButtonOffset = 18;
-	const int ButtonCaptionWidth = KnobCaptionWidth;
-	const int ButtonCaptionOffset = 14;
-
-	const int OptionMenuWidth = 100;
-	const int OptionMenuButtonOffset = 0;
-	const int OptionMenuCaptionWidth = 120;
-	const int OptionMenuCaptionOffset = 18;
-
-	const int SpacerWidth = BaseSize;
-
 	VstEditor::VstEditor(AudioEffect *audioEffect, int width, int height, string title)
 		: AEffGUIEditor(audioEffect)
 		, title(title)
@@ -80,8 +55,6 @@ namespace WaveSabreVstLib
 
 		currentX = LeftMargin;
 		currentY = TitleAreaHeight;
-		currentRow = 1;
-		maxX = currentX;
 
 		Open();
 
@@ -99,7 +72,6 @@ namespace WaveSabreVstLib
 	{
 		currentX = LeftMargin;
 		currentY += RowHeight;
-		currentRow++;
 	}
 
 	CTextLabel *VstEditor::addTextLabel(int x, int y, int w, int h, string text, CFontRef fontId, CHoriTxtAlign textAlign)
@@ -142,7 +114,6 @@ namespace WaveSabreVstLib
 		addTextLabel(x + KnobWidth / 2 - KnobCaptionWidth / 2, y + KnobCaptionOffset, KnobCaptionWidth, BaseSize, caption, kNormalFontVerySmall, kCenterText);
 
 		currentX += KnobWidth;
-		maxX = max(currentX, maxX);
 
 		return c;
 	}
@@ -166,7 +137,6 @@ namespace WaveSabreVstLib
 		addTextLabel(x + ButtonWidth / 2 - ButtonCaptionWidth / 2, y + ButtonCaptionOffset, ButtonCaptionWidth, BaseSize, caption, kNormalFontVerySmall, kCenterText);
 
 		currentX += ButtonWidth;
-		maxX = max(currentX, maxX);
 
 		return c;
 	}
@@ -198,7 +168,6 @@ namespace WaveSabreVstLib
 		addTextLabel(x + OptionMenuWidth / 2 - OptionMenuCaptionWidth / 2, y + OptionMenuCaptionOffset, OptionMenuCaptionWidth, BaseSize, caption, kNormalFontVerySmall, kCenterText);
 
 		currentX += OptionMenuWidth;
-		maxX = max(currentX, maxX);
 
 		return c;
 	}
@@ -206,6 +175,5 @@ namespace WaveSabreVstLib
 	void VstEditor::addSpacer()
 	{
 		currentX += SpacerWidth;
-		maxX = max(currentX, maxX);
 	}
 }
