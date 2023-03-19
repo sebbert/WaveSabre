@@ -19,6 +19,7 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 
 VectronVst::VectronVst(audioMasterCallback audioMaster)
 	: VstPlug(audioMaster, (int)Vectron::ParamIndices::NumParams, 0, 2, 'Vtrn', new Vectron(), true)
+	, Device(static_cast<Vectron*>(getDevice()))
 {
 	setEditor(new VectronEditor(this));
 }

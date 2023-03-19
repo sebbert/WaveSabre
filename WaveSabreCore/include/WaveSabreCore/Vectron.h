@@ -54,16 +54,28 @@ namespace WaveSabreCore
 		class ModOscillator
 		{
 		public:
-			double Next(double *phaseVar, double note, const Modulation *mod);
+			double Next(
+				double *phaseVar,
+				double note,
+				double scale,
+				double thetha,
+				const Modulation *mod
+			) const;
 
 			ModParam Scale, Offset, Detune;
-
-			double Phase;
 		};
 
 		class PhaseModulator
 		{
 		public:
+			struct State
+			{
+				double PhaseX, PhaseY;
+				double OutputX, OutputY;
+			};
+
+			void Next(State *state, double note, const Modulation *mod) const;
+
 			ModParam Scale, Offset;
 
 			ModOscillator X, Y;
@@ -72,7 +84,13 @@ namespace WaveSabreCore
 		class Oscillator
 		{
 		public:
-			inline float Next(double *phaseVar, double note, double modX, double modY, const Modulation *mod);
+			float Next(
+				double *phaseVar,
+				double note,
+				double modX,
+				double modY,
+				const Modulation *mod
+			) const;
 
 			ModParam Offset;
 			ModParam Mod;
@@ -94,14 +112,16 @@ namespace WaveSabreCore
 
 			float panLeft, panRight;
 
-			double xModPhase, yModPhase, osc1Phase;
+			PhaseModulator::State phaseModState;
+
+			double osc1Phase;
 			Envelope env1, env2;
 		};
 
-protected:
 		PhaseModulator phaseMod;
 		Oscillator osc1;
 		Envelope env1, env2;
+protected:
 	};
 }
 

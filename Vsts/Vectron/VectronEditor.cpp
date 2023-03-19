@@ -1,10 +1,14 @@
 #include "VectronEditor.h"
 
+#include "PhaseModPlotView.h"
+
 #include <WaveSabreCore.h>
 using namespace WaveSabreCore;
 
-VectronEditor::VectronEditor(AudioEffect *audioEffect)
-	: VstEditor(audioEffect, 600, 700, "VECTRON")
+VectronEditor::VectronEditor(VectronVst *vst)
+	: VstEditor(vst, 800, 700, "VECTRON")
+	, vectron(vst->Device)
+	, phaseModPlot(nullptr)
 {
 }
 
@@ -28,27 +32,38 @@ VectronEditor::~VectronEditor()
 void VectronEditor::Open()
 {
 	MOD_KNOBS(Vectron::ParamIndices::ModScale, "MOD");
-	addSpacer();
 	MOD_KNOBS(Vectron::ParamIndices::ModOffset, "OFFSET");
-
 	addSpacer();
+
 	MOD_KNOBS(Vectron::ParamIndices::ModXScale, "X MOD");
 	MOD_KNOBS(Vectron::ParamIndices::ModXOffset, "X OFFSET");
 	MOD_KNOBS(Vectron::ParamIndices::ModXDetune, "X DETUNE");
-
 	addSpacer();
+
 	MOD_KNOBS(Vectron::ParamIndices::ModYScale, "Y MOD");
 	MOD_KNOBS(Vectron::ParamIndices::ModYOffset, "Y OFFSET");
 	MOD_KNOBS(Vectron::ParamIndices::ModYDetune, "Y DETUNE");
-
-	startNextRow();
-	startNextRow();
-	startNextRow();
-	startNextRow();
-
-	MOD_KNOBS(Vectron::ParamIndices::Osc1Offset, "OFFSET");
 	addSpacer();
-	MOD_KNOBS(Vectron::ParamIndices::Osc1Mod, "MOD");
+	
+	if (phaseModPlot == nullptr)
+	{
+		constexpr auto size = RowHeight * 3;
+
+		CRect plotRect(currentX, currentY, currentX + size, currentY + size);
+
+		phaseModPlot = new PhaseModPlotView(vectron, plotRect);
+		phaseModPlot->invalid();
+		frame->addView(phaseModPlot);
+	}
+
+	startNextRow();
+	startNextRow();
+	startNextRow();
+	startNextRow();
+
+	MOD_KNOBS(Vectron::ParamIndices::Osc1Offset, "OSC1 OFFSET");
+	addSpacer();
+	MOD_KNOBS(Vectron::ParamIndices::Osc1Mod, "OSC1 MOD");
 	addSpacer();
 	addSpacer();
 
@@ -71,4 +86,28 @@ void VectronEditor::Open()
 
 
 	VstEditor::Open();
+}
+
+void VectronEditor::Close()
+{
+	if (phaseModPlot)
+	{
+		frame->removeView(phaseModPlot, false);
+	}
+}
+
+void VectronEditor::setParameter(VstInt32 index, float value)
+{
+	if (phaseModPlot) phaseModPlot->invalid();
+	frame->invalid();
+
+	VstEditor::setParameter(index, value);
+}
+
+void VectronEditor::valueChanged(CControl *control)
+{
+	if (phaseModPlot) phaseModPlot->invalid();
+	frame->invalid();
+
+	VstEditor::valueChanged(control);
 }
