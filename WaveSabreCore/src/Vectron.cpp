@@ -4,9 +4,9 @@
 #include <math.h>
 
 #define SET_MOD_PARAM(INDEX, PARAM) \
-	case INDEX:          PARAM.Value = value; \
-	case INDEX##Env1Amt: PARAM.Env1Amt = Helpers::UnitToSigned(value); \
-	case INDEX##Env2Amt: PARAM.Env2Amt = Helpers::UnitToSigned(value);
+	case INDEX:          PARAM.Value = value; break; \
+	case INDEX##Env1Amt: PARAM.Env1Amt = Helpers::UnitToSigned(value); break; \
+	case INDEX##Env2Amt: PARAM.Env2Amt = Helpers::UnitToSigned(value); break;
 
 #define GET_MOD_PARAM(INDEX, PARAM) \
 	case INDEX:          return PARAM.Value; \
