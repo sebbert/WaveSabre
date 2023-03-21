@@ -23,6 +23,7 @@ protected:
 	Vectron *vectron;
 
 	class PhaseModPlotView *phaseModPlot;
+	class OscillatorPlotView *osc1Plot;
 };
 
 #endif

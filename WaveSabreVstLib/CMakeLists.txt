@@ -21,6 +21,7 @@ add_library(WaveSabreVstLib STATIC
 	${VSTSDK3_DIR}/vstgui.sf/libpng/pngwutil.c
 	${VSTSDK3_DIR}/vstgui.sf/vstgui/aeffguieditor.cpp
 	${VSTSDK3_DIR}/vstgui.sf/vstgui/cfileselector.cpp
+	${VSTSDK3_DIR}/vstgui.sf/vstgui/cvstguitimer.cpp
 	${VSTSDK3_DIR}/vstgui.sf/vstgui/vstcontrols.cpp
 	${VSTSDK3_DIR}/vstgui.sf/vstgui/vstgui.cpp
 	${VSTSDK3_DIR}/vstgui.sf/vstgui/vstguidebug.cpp
@@ -42,6 +43,8 @@ add_library(WaveSabreVstLib STATIC
 	src/NoTextCOptionMenu.cpp
 	src/VstEditor.cpp
 	src/VstPlug.cpp)
+
+	
 
 target_include_directories(WaveSabreVstLib PUBLIC
 	include
