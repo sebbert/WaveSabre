@@ -1,6 +1,7 @@
 #include "VectronEditor.h"
 
 #include "PhaseModPlotView.h"
+#include "OscillatorPlotView.h"
 
 #include <WaveSabreCore.h>
 using namespace WaveSabreCore;
@@ -61,9 +62,21 @@ void VectronEditor::Open()
 	startNextRow();
 	startNextRow();
 
+	if (osc1Plot == nullptr)
+	{
+		constexpr auto size = RowHeight * 3;
+
+		CRect plotRect(currentX, currentY, currentX + KnobWidth*2, currentY + RowHeight);
+
+		osc1Plot = new OscillatorPlotView(vectron, plotRect);
+		osc1Plot->invalid();
+		frame->addView(osc1Plot);
+	}
+
 	MOD_KNOBS(Vectron::ParamIndices::Osc1Offset, "OSC1 OFFSET");
 	addSpacer();
 	MOD_KNOBS(Vectron::ParamIndices::Osc1Mod, "OSC1 MOD");
+
 	addSpacer();
 	addSpacer();
 
@@ -94,11 +107,15 @@ void VectronEditor::Close()
 	{
 		frame->removeView(phaseModPlot, false);
 	}
+
+	if (osc1Plot)
+	{
+		frame->removeView(osc1Plot);
+	}
 }
 
 void VectronEditor::setParameter(VstInt32 index, float value)
 {
-	if (phaseModPlot) phaseModPlot->invalid();
 	frame->invalid();
 
 	VstEditor::setParameter(index, value);
@@ -106,7 +123,6 @@ void VectronEditor::setParameter(VstInt32 index, float value)
 
 void VectronEditor::valueChanged(CControl *control)
 {
-	if (phaseModPlot) phaseModPlot->invalid();
 	frame->invalid();
 
 	VstEditor::valueChanged(control);

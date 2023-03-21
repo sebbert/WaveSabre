@@ -168,7 +168,6 @@ namespace WaveSabreCore
 		double phaseIncrement = freq / Helpers::CurrentSampleRate;
 
 		double phaseModAmt = Mod.GetValue(mod);
-		double phaseModXAmt = Mod.GetValue(mod);
 		double x = phaseModAmt * modX;
 		double y = phaseModAmt * modY * 8.0;
 
