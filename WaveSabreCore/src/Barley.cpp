@@ -15,10 +15,18 @@ namespace WaveSabreCore
 	{
 		for (int i = 0; i < maxVoices; i++) voices[i] = new BarleyVoice(this);
 
+		memset(grains, 0, sizeof(grains));
+
+		activeVoiceCount = 0;
+		freeGrainCount = 0;
+		prevFreeGrainCount = 0;
+		xfadeSize = 0;
+
+
 		buffer = nullptr;
 		bufferSize = 0;
 		writeHead = 0;
-		bufferSizeParam = 0.7f;
+		bufferSizeParam = 0.5f;
 		xfadeAmt = 0.1f;
 		grainPosition = 0.5f;
 		grainPositionSpread = 0.1f;
@@ -65,10 +73,10 @@ namespace WaveSabreCore
 
 	void Barley::Run(double songPosition, float **inputs, float **outputs, int numSamples)
 	{
-		auto bufferSizeMs = 20 + 20000.0 * Helpers::Pow2(bufferSizeParam);
+		auto bufferSizeMs = 200 + 10000.0 * Helpers::Pow2(bufferSizeParam);
 		auto newBufferSize = (int)((double)bufferSizeMs * Helpers::CurrentSampleRate / 1000.0);
-		if (newBufferSize < 1)
-			newBufferSize = 1;
+		if (newBufferSize < 2)
+			newBufferSize = 2;
 
 		if (!buffer || bufferSize != newBufferSize)
 		{
@@ -149,7 +157,8 @@ namespace WaveSabreCore
 		auto xfadeBufferSize = bufferSize - xfadeSize;
 		auto sizeFactor = grainSize;// + grainSizeSpread * Helpers::RandFloat() * 2.0f - 1.0f;
 		double size = (bufferSize * sizeFactor);
-		if (size < 128) size = 128;
+		auto minSize = (int)(Helpers::CurrentSampleRate * 0.5);
+		if (size < minSize) size = minSize;
 		if (size > bufferSize * 0.6) size = bufferSize * 0.6;
 
 		auto voiceIndex = (int)(Helpers::RandFloat() * activeVoiceCount);
@@ -186,7 +195,7 @@ namespace WaveSabreCore
 	{
 		if (!active) return;
 
-		float frame[2];
+		float frame[2], xfadeFrame[2];
 
 		const auto bufferSize = device->bufferSize;
 		const auto writeHead = device->writeHead;
@@ -195,42 +204,41 @@ namespace WaveSabreCore
 		const double invXfadeSize = 1.0 / xfadeSize;
 		
 		int index = preDelay;
+		preDelay -= numSamples;
+		if (preDelay < 0) preDelay = 0;
 		if (index > numSamples) index = numSamples;
-		preDelay = 0;
 
 		for (; index < numSamples; ++index)
 		{
-			auto position = firstSample + phase;
+			auto readPos = ModEuclid(firstSample + phase, bufferSize);
 			double xfadeEnd = writeHead;
 			double xfadeStart = xfadeEnd - xfadeSize;
-			double samplePos = ModEuclid(position, bufferSize);
 
-			device->ReadFrame(samplePos, frame);
-/*
-			double adjustedPos = samplePos;
-			if (adjustedPos > xfadeEnd)
-				adjustedPos -= xfadeBufferSize;
-			
+			device->ReadFrame(readPos, frame);
+
+			double adjustedPos = readPos;
+			if (adjustedPos >= writeHead)
+				adjustedPos -= bufferSize;
+
 			double xfadePosition = adjustedPos - xfadeStart;
 			auto xfadePhase = (float)(xfadePosition * invXfadeSize);
 			if (xfadePhase >= 0.0f && xfadePhase <= 1.0f)
 			{
-				float xfadeFrame[2];
-				device->ReadFrame((int)ModEuclid(xfadePosition, bufferSize), xfadeFrame);
+				auto xfadeReadPos = ModEuclid(readPos + xfadeSize, bufferSize);
+				device->ReadFrame(xfadeReadPos, xfadeFrame);
 				
 				frame[0] = Helpers::Mix(frame[0], xfadeFrame[0], xfadePhase);
 				frame[1] = Helpers::Mix(frame[1], xfadeFrame[1], xfadePhase);
 			}
-*/
 
 			float env = envPhase;
-			if (env >= 1.0f)
+			if (env > 1.0f)
 				env = 2.0f - env;
 
-/*
+
 			float window = 1.0f - (float)(Helpers::FastCos(env * M_PI) + 1.0f) * 0.5f;
-			env += envSmooth * (window - env);
-*/
+			env = Helpers::Mix(env, window, envSmooth);
+
 
 			outputs[0][index] += frame[0] * env * gainL * 0.2f;
 			outputs[1][index] += frame[1] * env * gainR * 0.2f;

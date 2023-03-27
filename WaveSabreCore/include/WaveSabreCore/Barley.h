@@ -9,7 +9,7 @@ namespace WaveSabreCore
 	class Barley : public SynthDevice
 	{
 	public:
-		constexpr static auto MaxGrains = 64;
+		constexpr static auto MaxGrains = 128;
 
 		enum class ParamIndices
 		{
