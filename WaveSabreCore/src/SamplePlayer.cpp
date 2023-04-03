@@ -24,9 +24,9 @@ namespace WaveSabreCore
 		IsActive = false;
 	}
 
-	void SamplePlayer::CalcPitch(double note)
+	void SamplePlayer::CalcPitch(double note, double sampleRate)
 	{
-		double freqDelta = Helpers::Exp2(note / 12.0);
+		double freqDelta = Helpers::Exp2(note / 12.0) * (sampleRate / Helpers::CurrentSampleRate);
 		if (!reverse)
 		{
 			sampleDelta = freqDelta;
