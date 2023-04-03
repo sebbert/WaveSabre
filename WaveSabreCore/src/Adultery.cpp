@@ -73,6 +73,8 @@ namespace WaveSabreCore
 		modSustain = 1.0f;
 		modRelease = 1.5f;
 
+		useUnityNote = false;
+
 		masterLevel = 0.5f;
 	}
 
@@ -138,6 +140,8 @@ namespace WaveSabreCore
 					Wsmp wsmp;
 					memcpy(&wsmp, wave, sizeof(Wsmp));
 					wave += wsmp.size + 8; // size field doesn't account for tag or length fields
+
+					sampleUnityNoteDetune = wsmp.fineTune*0.01 - wsmp.unityNote;
 
 					// Read data chunk
 					auto dataChunkTag = *((unsigned int *)wave); // Should be 'data'
@@ -205,6 +209,8 @@ namespace WaveSabreCore
 		case ParamIndices::VoiceMode: SetVoiceMode(Helpers::ParamToVoiceMode(value)); break;
 		case ParamIndices::SlideTime: Slide = value; break;
 
+		case ParamIndices::UseUnityNote: useUnityNote = Helpers::ParamToBoolean(value); break;
+
 		case ParamIndices::Master: masterLevel = value; break;
 		}
 	}
@@ -249,6 +255,8 @@ namespace WaveSabreCore
 		
 		case ParamIndices::VoiceMode: return Helpers::VoiceModeToParam(GetVoiceMode());
 		case ParamIndices::SlideTime: return Slide;
+
+		case ParamIndices::UseUnityNote: return Helpers::BooleanToParam(useUnityNote);
 
 		case ParamIndices::Master: return masterLevel;
 		}
@@ -358,12 +366,21 @@ namespace WaveSabreCore
 
 	void Adultery::AdulteryVoice::calcPitch()
 	{
-		double note = GetNote() - 60 + Detune + adultery->fineTune * 2.0f - 1.0f + AdulteryVoice::coarseDetune(adultery->coarseTune);
+		double note = GetNote() + Detune + adultery->fineTune * 2.0f - 1.0f + AdulteryVoice::coarseDetune(adultery->coarseTune);
 		
-		// Adultery and specimen previously did not account for different sample rates.
-		// Gm.dls samples are 22050Hz, so assuming a playback rate of 44100Hz,
-		// every sample would be pitched up an octave. So let's emulate that here.
-		note += 12;
+		if (adultery->useUnityNote)
+		{
+			note += adultery->sampleUnityNoteDetune;
+		}
+		else
+		{
+			note -= 60;
+	
+			// Adultery and specimen previously did not account for different sample rates.
+			// Gm.dls samples are 22050Hz, so assuming a playback rate of 44100Hz,
+			// every sample would be pitched up an octave. So let's emulate that here.
+			note += 12;
+		}
 
 		samplePlayer.CalcPitch(note, Adultery::SampleRate);
 	}
