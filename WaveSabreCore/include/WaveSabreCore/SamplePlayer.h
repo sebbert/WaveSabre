@@ -33,7 +33,7 @@ namespace WaveSabreCore
 	public:
 		SamplePlayer();
 
-		void CalcPitch(double note);
+		void CalcPitch(double note, double sampleRate);
 		void InitPos();
 		void RunPrep();
 		float Next();

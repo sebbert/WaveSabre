@@ -330,6 +330,7 @@ namespace WaveSabreCore
 
 	void Specimen::SpecimenVoice::calcPitch()
 	{
-		samplePlayer.CalcPitch(GetNote() - 60 + Detune + specimen->fineTune * 2.0f - 1.0f + SpecimenVoice::coarseDetune(specimen->coarseTune));
+		double note = GetNote() - 60 + Detune + specimen->fineTune * 2.0f - 1.0f + SpecimenVoice::coarseDetune(specimen->coarseTune);
+		samplePlayer.CalcPitch(note, Specimen::SampleRate);
 	}
 }

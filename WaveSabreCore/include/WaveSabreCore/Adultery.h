@@ -60,6 +60,8 @@ namespace WaveSabreCore
 		virtual void SetParam(int index, float value);
 		virtual float GetParam(int index) const;
 
+		static const int SampleRate = 22050;
+
 	private:
 		class AdulteryVoice : public Voice
 		{

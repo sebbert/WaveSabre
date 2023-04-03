@@ -358,6 +358,13 @@ namespace WaveSabreCore
 
 	void Adultery::AdulteryVoice::calcPitch()
 	{
-		samplePlayer.CalcPitch(GetNote() - 60 + Detune + adultery->fineTune * 2.0f - 1.0f + AdulteryVoice::coarseDetune(adultery->coarseTune));
+		double note = GetNote() - 60 + Detune + adultery->fineTune * 2.0f - 1.0f + AdulteryVoice::coarseDetune(adultery->coarseTune);
+		
+		// Adultery and specimen previously did not account for different sample rates.
+		// Gm.dls samples are 22050Hz, so assuming a playback rate of 44100Hz,
+		// every sample would be pitched up an octave. So let's emulate that here.
+		note += 12;
+
+		samplePlayer.CalcPitch(note, Adultery::SampleRate);
 	}
 }
