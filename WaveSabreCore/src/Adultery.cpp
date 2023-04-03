@@ -88,6 +88,11 @@ namespace WaveSabreCore
 		case ParamIndices::SampleIndex:
 			sampleIndex = (int)value - 1;
 
+			for (auto& voice : voices)
+			{
+				voice->IsOn = false;
+			}
+
 			if (sampleData)
 			{
 				delete [] sampleData;
