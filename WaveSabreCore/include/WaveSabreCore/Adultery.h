@@ -51,6 +51,8 @@ namespace WaveSabreCore
 			VoiceMode,
 			SlideTime,
 
+			UseUnityNote,
+
 			NumParams,
 		};
 
@@ -108,6 +110,9 @@ namespace WaveSabreCore
 		StateVariableFilterType filterType;
 		float filterFreq, filterResonance, filterModAmt;
 		float modAttack, modDecay, modSustain, modRelease;
+
+		bool useUnityNote;
+		double sampleUnityNoteDetune;
 	};
 }
 

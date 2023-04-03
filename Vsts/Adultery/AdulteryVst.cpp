@@ -53,6 +53,8 @@ void AdulteryVst::getParameterName(VstInt32 index, char *text)
 	case Adultery::ParamIndices::Master: vst_strncpy(text, "Master", kVstMaxParamStrLen); break;
 	case Adultery::ParamIndices::VoiceMode: vst_strncpy(text, "Mode", kVstMaxParamStrLen); break;
 	case Adultery::ParamIndices::SlideTime: vst_strncpy(text, "Slide", kVstMaxParamStrLen); break;
+
+	case Adultery::ParamIndices::UseUnityNote: vst_strncpy(text, "Unity", kVstMaxParamStrLen); break;
 	}
 }
 
