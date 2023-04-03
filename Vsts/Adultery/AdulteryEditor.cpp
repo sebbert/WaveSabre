@@ -7,7 +7,7 @@ using namespace WaveSabreCore;
 using namespace std;
 
 AdulteryEditor::AdulteryEditor(AudioEffect *audioEffect, Adultery *adultery)
-	: VstEditor(audioEffect, 580, 400, "ADULTERY")
+	: VstEditor(audioEffect, 620, 400, "ADULTERY")
 {
 	this->adultery = adultery;
 
@@ -210,6 +210,8 @@ void AdulteryEditor::Open()
 	addKnob((VstInt32)Adultery::ParamIndices::CoarseTune, "COARSE TUNE");
 	addSpacer();
 	addKnob((VstInt32)Adultery::ParamIndices::FineTune, "FINE TUNE");
+	addSpacer();
+	addKnob((VstInt32)Adultery::ParamIndices::UseUnityNote, "UNITY");
 	addSpacer();
 	addKnob((VstInt32)Adultery::ParamIndices::VoiceMode, "MODE");
 	addKnob((VstInt32)Adultery::ParamIndices::SlideTime, "SLIDE");
