@@ -12,10 +12,13 @@ namespace WaveSabreCore
 
 		osc1Waveform = osc2Waveform = osc3Waveform = 0.0f;
 		osc1PulseWidth = osc2PulseWidth = osc3PulseWidth = .5f;
+		osc1PhaseOfs = osc2PhaseOfs = osc3PhaseOfs = 0.0f;
+		osc1PhaseRnd = osc2PhaseRnd = osc3PhaseRnd = 1.0f;
 		osc1DetuneCoarse = osc2DetuneCoarse = osc3DetuneCoarse = 0.0f;
 		osc1DetuneFine = osc2DetuneFine = osc3DetuneFine = 0.0f;
 		osc1Volume = 1.0f;
 		osc2Volume = osc3Volume = noiseVolume = 0.0f;
+		noiseSeed = 0.0f;
 
 		filterType = StateVariableFilterType::Lowpass;
 		filterFreq = 20000.0f - 20.0f;
@@ -48,22 +51,29 @@ namespace WaveSabreCore
 		case ParamIndices::Osc1Waveform: osc1Waveform = value; break;
 		case ParamIndices::Osc1PulseWidth: osc1PulseWidth = 1.0f - value; break;
 		case ParamIndices::Osc1Volume: osc1Volume = value; break;
+		case ParamIndices::Osc1PhaseOfs: osc1PhaseOfs = value; break;
+		case ParamIndices::Osc1PhaseRnd: osc1PhaseRnd = value; break;
 		case ParamIndices::Osc1DetuneCoarse: osc1DetuneCoarse = value; break;
 		case ParamIndices::Osc1DetuneFine: osc1DetuneFine = value; break;
 
 		case ParamIndices::Osc2Waveform: osc2Waveform = value; break;
 		case ParamIndices::Osc2PulseWidth: osc2PulseWidth = 1.0f - value; break;
 		case ParamIndices::Osc2Volume: osc2Volume = value; break;
+		case ParamIndices::Osc2PhaseOfs: osc2PhaseOfs = value; break;
+		case ParamIndices::Osc2PhaseRnd: osc2PhaseRnd = value; break;
 		case ParamIndices::Osc2DetuneCoarse: osc2DetuneCoarse = value; break;
 		case ParamIndices::Osc2DetuneFine: osc2DetuneFine = value; break;
 
 		case ParamIndices::Osc3Waveform: osc3Waveform = value; break;
 		case ParamIndices::Osc3PulseWidth: osc3PulseWidth = 1.0f - value; break;
 		case ParamIndices::Osc3Volume: osc3Volume = value; break;
+		case ParamIndices::Osc3PhaseOfs: osc3PhaseOfs = value; break;
+		case ParamIndices::Osc3PhaseRnd: osc3PhaseRnd = value; break;
 		case ParamIndices::Osc3DetuneCoarse: osc3DetuneCoarse = value; break;
 		case ParamIndices::Osc3DetuneFine: osc3DetuneFine = value; break;
 
 		case ParamIndices::NoiseVolume: noiseVolume = value; break;
+		case ParamIndices::NoiseSeed: noiseSeed = value; break;
 
 		case ParamIndices::FilterType: filterType = Helpers::ParamToStateVariableFilterType(value); break;
 		case ParamIndices::FilterFreq: filterFreq = Helpers::ParamToFrequency(value); break;
@@ -112,23 +122,30 @@ namespace WaveSabreCore
 			return osc1Waveform;
 
 		case ParamIndices::Osc1PulseWidth: return 1.0f - osc1PulseWidth;
+		case ParamIndices::Osc1PhaseOfs: return osc1PhaseOfs;
+		case ParamIndices::Osc1PhaseRnd: return osc1PhaseRnd;
 		case ParamIndices::Osc1Volume: return osc1Volume;
 		case ParamIndices::Osc1DetuneCoarse: return osc1DetuneCoarse;
 		case ParamIndices::Osc1DetuneFine: return osc1DetuneFine;
 
 		case ParamIndices::Osc2Waveform: return osc2Waveform;
 		case ParamIndices::Osc2PulseWidth: return 1.0f - osc2PulseWidth;
+		case ParamIndices::Osc2PhaseOfs: return osc2PhaseOfs;
+		case ParamIndices::Osc2PhaseRnd: return osc2PhaseRnd;
 		case ParamIndices::Osc2Volume: return osc2Volume;
 		case ParamIndices::Osc2DetuneCoarse: return osc2DetuneCoarse;
 		case ParamIndices::Osc2DetuneFine: return osc2DetuneFine;
 
 		case ParamIndices::Osc3Waveform: return osc3Waveform;
 		case ParamIndices::Osc3PulseWidth: return 1.0f - osc3PulseWidth;
+		case ParamIndices::Osc3PhaseOfs: return osc3PhaseOfs;
+		case ParamIndices::Osc3PhaseRnd: return osc3PhaseRnd;
 		case ParamIndices::Osc3Volume: return osc3Volume;
 		case ParamIndices::Osc3DetuneCoarse: return osc3DetuneCoarse;
 		case ParamIndices::Osc3DetuneFine: return osc3DetuneFine;
 
 		case ParamIndices::NoiseVolume: return noiseVolume;
+		case ParamIndices::NoiseSeed: return noiseSeed;
 
 		case ParamIndices::FilterType: return Helpers::StateVariableFilterTypeToParam(filterType);
 		case ParamIndices::FilterFreq: return Helpers::FrequencyToParam(filterFreq);
@@ -238,6 +255,25 @@ namespace WaveSabreCore
 	void Slaughter::SlaughterVoice::NoteOn(int note, int velocity, float detune, float pan)
 	{
 		Voice::NoteOn(note, velocity, detune, pan);
+
+		double osc1PhaseMax = Helpers::CurrentSampleRate / Helpers::NoteToFreq(note + coarseDetune(slaughter->osc1DetuneCoarse) + (double)slaughter->osc1DetuneFine);
+		double osc2PhaseMax = Helpers::CurrentSampleRate / Helpers::NoteToFreq(note + coarseDetune(slaughter->osc2DetuneCoarse) + (double)slaughter->osc2DetuneFine);
+		double osc3PhaseMax = Helpers::CurrentSampleRate / Helpers::NoteToFreq(note + coarseDetune(slaughter->osc3DetuneCoarse) + (double)slaughter->osc3DetuneFine);
+
+		osc1.Phase = (slaughter->osc1PhaseOfs + slaughter->osc1PhaseRnd * Helpers::RandFloat()) * osc1PhaseMax;
+		osc2.Phase = (slaughter->osc2PhaseOfs + slaughter->osc2PhaseRnd * Helpers::RandFloat()) * osc2PhaseMax;
+		osc3.Phase = (slaughter->osc3PhaseOfs + slaughter->osc3PhaseRnd * Helpers::RandFloat()) * osc3PhaseMax;
+
+		osc1.Integral = 0.0;
+		osc2.Integral = 0.0;
+		osc3.Integral = 0.0;
+
+		int noiseSeed = (int)(slaughter->noiseSeed * 0x10000);
+		if (noiseSeed == 0)
+		{
+			noiseSeed = Helpers::GlobalRandom.Seed;
+		}
+		random.Seed = noiseSeed;
 
 		ampEnv.Attack = slaughter->ampAttack;
 		ampEnv.Decay = slaughter->ampDecay;

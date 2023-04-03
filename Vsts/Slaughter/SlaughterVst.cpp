@@ -22,23 +22,30 @@ void SlaughterVst::getParameterName(VstInt32 index, char *text)
 	{
 	case Slaughter::ParamIndices::Osc1Waveform: vst_strncpy(text, "Osc1 Wf", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc1PulseWidth: vst_strncpy(text, "Osc1 Pw", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::Osc1PhaseOfs: vst_strncpy(text, "Osc1 Ofs", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::Osc1PhaseRnd: vst_strncpy(text, "Osc1 Rnd", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc1Volume: vst_strncpy(text, "Osc1 Vol", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc1DetuneCoarse: vst_strncpy(text, "Osc1 Cs", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc1DetuneFine: vst_strncpy(text, "Osc1 Fn", kVstMaxParamStrLen); break;
 
 	case Slaughter::ParamIndices::Osc2Waveform: vst_strncpy(text, "Osc2 Wf", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc2PulseWidth: vst_strncpy(text, "Osc2 Pw", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::Osc2PhaseOfs: vst_strncpy(text, "Osc2 Ofs", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::Osc2PhaseRnd: vst_strncpy(text, "Osc2 Rnd", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc2Volume: vst_strncpy(text, "Osc2 Vol", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc2DetuneCoarse: vst_strncpy(text, "Osc2 Cs", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc2DetuneFine: vst_strncpy(text, "Osc2 Fn", kVstMaxParamStrLen); break;
 
 	case Slaughter::ParamIndices::Osc3Waveform: vst_strncpy(text, "Osc3 Wf", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc3PulseWidth: vst_strncpy(text, "Osc3 Pw", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::Osc3PhaseOfs: vst_strncpy(text, "Osc3 Ofs", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::Osc3PhaseRnd: vst_strncpy(text, "Osc3 Rnd", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc3Volume: vst_strncpy(text, "Osc3 Vol", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc3DetuneCoarse: vst_strncpy(text, "Osc3 Cs", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::Osc3DetuneFine: vst_strncpy(text, "Osc3 Fn", kVstMaxParamStrLen); break;
 
 	case Slaughter::ParamIndices::NoiseVolume: vst_strncpy(text, "Noiz Vol", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::NoiseSeed: vst_strncpy(text, "Noiz Rnd", kVstMaxParamStrLen); break;
 
 	case Slaughter::ParamIndices::FilterType: vst_strncpy(text, "Flt Type", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::FilterFreq: vst_strncpy(text, "Flt Freq", kVstMaxParamStrLen); break;

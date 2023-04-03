@@ -4,6 +4,7 @@
 #include "StateVariableFilter.h"
 #include "Twister.h"
 #include "SynthDevice.h"
+#include "Random.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -15,11 +16,14 @@ namespace WaveSabreCore
 	public:
 		static double CurrentSampleRate;
 		static int CurrentTempo;
-		static int RandomSeed;
+		static Random GlobalRandom;
 
 		static void Init();
 
-		static float RandFloat();
+		static inline float RandFloat()
+		{
+			return GlobalRandom.Next();
+		}
 
 		static double Exp2(double x);
 		static float Exp2F(float x);
