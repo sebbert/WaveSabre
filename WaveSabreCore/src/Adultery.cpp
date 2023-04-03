@@ -19,6 +19,7 @@ typedef struct
 {
 	char tag[4];
 	unsigned int size;
+	unsigned int cbSize;
 	unsigned short unityNote;
 	short fineTune;
 	int gain;
