@@ -87,13 +87,13 @@ namespace WaveSabreCore
 {
 	double Helpers::CurrentSampleRate = 44100.0;
 	int Helpers::CurrentTempo = 120;
-	int Helpers::RandomSeed = 1;
+	Random Helpers::GlobalRandom;
 
 	double Helpers::fastSinTab[adjustedFastSinTabSize];
 
 	void Helpers::Init()
 	{
-		RandomSeed = 1;
+		GlobalRandom.Reset();
 
 		for (int i = 0; i < adjustedFastSinTabSize; i++)
 		{
@@ -104,11 +104,6 @@ namespace WaveSabreCore
 			fastSinTab[i] = sin(phase);
 #endif
 		}
-	}
-
-	float Helpers::RandFloat()
-	{
-		return (float)((RandomSeed *= 0x15a4e35) % 255) / 255.0f;
 	}
 
 	double Helpers::Exp2(double x)
