@@ -4,7 +4,7 @@
 using namespace WaveSabreCore;
 
 SlaughterEditor::SlaughterEditor(AudioEffect *audioEffect)
-	: VstEditor(audioEffect, 520, 600, "SLAUGHTER")
+	: VstEditor(audioEffect, 600, 600, "SLAUGHTER")
 {
 }
 
@@ -16,13 +16,14 @@ void SlaughterEditor::Open()
 {
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc1Waveform, "WAVEFORM");
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc1PulseWidth, "PW");
+	addKnob((VstInt32)Slaughter::ParamIndices::Osc1PhaseOfs, "PHASE");
+	addKnob((VstInt32)Slaughter::ParamIndices::Osc1PhaseRnd, "RANDOM");
 	addSpacer();
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc1DetuneCoarse, "DETUNE");
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc1DetuneFine, "DET FINE");
 	addSpacer();
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc1Volume, "VOLUME");
 	
-	addSpacer();
 	addSpacer();
 	addSpacer();
 	addSpacer();
@@ -34,6 +35,8 @@ void SlaughterEditor::Open()
 
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc2Waveform, "WAVEFORM");
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc2PulseWidth, "PW");
+	addKnob((VstInt32)Slaughter::ParamIndices::Osc2PhaseOfs, "PHASE");
+	addKnob((VstInt32)Slaughter::ParamIndices::Osc2PhaseRnd, "RANDOM");
 	addSpacer();
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc2DetuneCoarse, "DETUNE");
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc2DetuneFine, "DET FINE");
@@ -44,6 +47,8 @@ void SlaughterEditor::Open()
 
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc3Waveform, "WAVEFORM");
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc3PulseWidth, "PW");
+	addKnob((VstInt32)Slaughter::ParamIndices::Osc3PhaseOfs, "PHASE");
+	addKnob((VstInt32)Slaughter::ParamIndices::Osc3PhaseRnd, "RANDOM");
 	addSpacer();
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc3DetuneCoarse, "DETUNE");
 	addKnob((VstInt32)Slaughter::ParamIndices::Osc3DetuneFine, "DET FINE");
@@ -53,6 +58,7 @@ void SlaughterEditor::Open()
 	startNextRow();
 
 	addKnob((VstInt32)Slaughter::ParamIndices::NoiseVolume, "NOISE");
+	addKnob((VstInt32)Slaughter::ParamIndices::NoiseSeed, "SEED");
 
 	startNextRow();
 

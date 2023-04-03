@@ -4,6 +4,7 @@
 #include "SynthDevice.h"
 #include "Envelope.h"
 #include "StateVariableFilter.h"
+#include "Random.h"
 
 namespace WaveSabreCore
 {
@@ -69,6 +70,16 @@ namespace WaveSabreCore
 
 			FilterScAmt,
 
+			Osc1PhaseOfs,
+			Osc2PhaseOfs,
+			Osc3PhaseOfs,
+
+			Osc1PhaseRnd,
+			Osc2PhaseRnd,
+			Osc3PhaseRnd,
+
+			NoiseSeed,
+
 			NumParams,
 		};
 
@@ -107,12 +118,14 @@ namespace WaveSabreCore
 
 			Oscillator osc1, osc2, osc3;
 			StateVariableFilter filter;
+
+			Random random;
 		};
 
-		float osc1Waveform, osc1PulseWidth, osc1Volume, osc1DetuneCoarse, osc1DetuneFine;
-		float osc2Waveform, osc2PulseWidth, osc2Volume, osc2DetuneCoarse, osc2DetuneFine;
-		float osc3Waveform, osc3PulseWidth, osc3Volume, osc3DetuneCoarse, osc3DetuneFine;
-		float noiseVolume;
+		float osc1Waveform, osc1PulseWidth, osc1PhaseOfs, osc1PhaseRnd, osc1Volume, osc1DetuneCoarse, osc1DetuneFine;
+		float osc2Waveform, osc2PulseWidth, osc2PhaseOfs, osc2PhaseRnd, osc2Volume, osc2DetuneCoarse, osc2DetuneFine;
+		float osc3Waveform, osc3PulseWidth, osc3PhaseOfs, osc3PhaseRnd, osc3Volume, osc3DetuneCoarse, osc3DetuneFine;
+		float noiseVolume, noiseSeed;
 		StateVariableFilterType filterType;
 		float filterFreq, filterResonance, filterModAmt, filterScAmt;
 		float ampAttack, ampDecay, ampSustain, ampRelease;
