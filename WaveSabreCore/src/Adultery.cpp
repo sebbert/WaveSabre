@@ -22,7 +22,6 @@ typedef struct
 	unsigned int cbSize;
 	unsigned short unityNote;
 	short fineTune;
-	int gain;
 	int attenuation;
 	unsigned int fulOptions;
 	unsigned int loopCount;
