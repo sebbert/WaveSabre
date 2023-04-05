@@ -1,12 +1,8 @@
-#define NOMINMAX
-
 #include <WaveSabreCore/Barley.h>
 #include <WaveSabreCore/Helpers.h>
 
-#include <clouds/dsp/frame.h>
-#include <clouds/dsp/granular_processor.h>
-
-#include <cmath>
+#include <math.h>
+#include <string.h>
 
 namespace WaveSabreCore
 {
