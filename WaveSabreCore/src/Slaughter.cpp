@@ -225,9 +225,7 @@ namespace WaveSabreCore
 			constexpr float filterFreqRange = 20000.0f - 20.0f;
 
 			float filterEnvMod = modEnv.GetValue() * (slaughter->filterModAmt * 2.0f - 1.0f);
-			float scInput = inputs[0][i];
-			float filterSidechainMod = scInput * (slaughter->filterScAmt * 2.0f - 1.0f);
-			float filterMod = filterEnvMod + filterSidechainMod;
+			float filterMod = filterEnvMod;
 			filter.SetFreq(Helpers::Clamp(slaughter->filterFreq + filterMod * filterFreqRange, 0.0f, filterFreqRange));
 
 			double baseNote = GetNote() + Detune + pitchEnv.GetValue() * slaughter->pitchEnvAmt + Helpers::FastSin(vibratoPhase) * slaughter->VibratoAmount + slaughter->Rise * 24.0f;
