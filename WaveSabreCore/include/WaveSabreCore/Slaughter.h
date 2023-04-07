@@ -80,6 +80,10 @@ namespace WaveSabreCore
 
 			NoiseSeed,
 
+			LFOAmt,
+			LFOWaveform,
+			LFOPulseWidth,
+
 			NumParams,
 		};
 
@@ -105,6 +109,7 @@ namespace WaveSabreCore
 			{
 			public:
 				float Next(double note, float waveform, float pulseWidth);
+				float NextPhaseMax(double phaseMax, float waveform, float pulseWidth);
 
 				double Phase;
 				double Integral;
@@ -120,6 +125,8 @@ namespace WaveSabreCore
 			StateVariableFilter filter;
 
 			Random random;
+
+			Oscillator lfoOscillator;
 		};
 
 		float osc1Waveform, osc1PulseWidth, osc1PhaseOfs, osc1PhaseRnd, osc1Volume, osc1DetuneCoarse, osc1DetuneFine;
@@ -132,6 +139,7 @@ namespace WaveSabreCore
 		float modAttack, modDecay, modSustain, modRelease;
 		float pitchAttack, pitchDecay, pitchSustain, pitchRelease, pitchEnvAmt;
 		float masterLevel;
+		float lfoAmt, lfoWaveform, lfoPulseWidth;
 	};
 }
 
