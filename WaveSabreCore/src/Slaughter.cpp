@@ -42,6 +42,10 @@ namespace WaveSabreCore
 		pitchEnvAmt = 0.0f;
 
 		masterLevel = .5f;
+
+		lfoAmt = 0.0f;
+		lfoWaveform = 0.0f;
+		lfoPulseWidth = 0.0f;
 	}
 
 	void Slaughter::SetParam(int index, float value)
@@ -110,6 +114,10 @@ namespace WaveSabreCore
 
 		case ParamIndices::VoiceMode: SetVoiceMode(Helpers::ParamToVoiceMode(value)); break;
 		case ParamIndices::SlideTime: Slide = value; break;
+
+		case ParamIndices::LFOAmt: lfoAmt = value; break;
+		case ParamIndices::LFOWaveform: lfoWaveform = value; break;
+		case ParamIndices::LFOPulseWidth: lfoPulseWidth = value; break;
 		}
 	}
 
@@ -182,6 +190,10 @@ namespace WaveSabreCore
 
 		case ParamIndices::VoiceMode: return Helpers::VoiceModeToParam(GetVoiceMode());
 		case ParamIndices::SlideTime: return Slide;
+		
+		case ParamIndices::LFOAmt: return lfoAmt;
+		case ParamIndices::LFOWaveform: return lfoWaveform;
+		case ParamIndices::LFOPulseWidth: return lfoPulseWidth;
 		}
 	}
 
@@ -220,6 +232,9 @@ namespace WaveSabreCore
 		float osc3VolumeScalar = slaughter->osc3Volume * slaughter->osc3Volume;
 		float noiseScalar = slaughter->noiseVolume * slaughter->noiseVolume;
 
+		double lfoWavelength = 120.0 / (double)Helpers::CurrentTempo / 8.0 / 8.0;
+		double lfoPhaseMax = Helpers::CurrentSampleRate * .5 * lfoWavelength;
+
 		for (int i = 0; i < numSamples; i++)
 		{
 			constexpr float filterFreqRange = 20000.0f - 20.0f;
@@ -234,7 +249,10 @@ namespace WaveSabreCore
 			if (osc2VolumeScalar > 0.0f) oscMix += (float)(osc2.Next(baseNote + osc2Detune, slaughter->osc2Waveform, slaughter->osc2PulseWidth) * osc2VolumeScalar);
 			if (osc3VolumeScalar > 0.0f) oscMix += (float)(osc3.Next(baseNote + osc3Detune, slaughter->osc3Waveform, slaughter->osc3PulseWidth) * osc3VolumeScalar);
 			if (noiseScalar > 0.0f) oscMix += Helpers::RandFloat() * noiseScalar;
-			float out = filter.Next(oscMix) * ampEnv.GetValue() * amp;
+			float lfo = 1.0f - lfoOscillator.NextPhaseMax(lfoPhaseMax, slaughter->lfoWaveform, slaughter->lfoPulseWidth)*0.5+0.5;
+			float lfoAmp = 1.0f - lfo * slaughter->lfoAmt;
+
+			float out = filter.Next(oscMix) * ampEnv.GetValue() * amp * lfoAmp;
 			outputs[0][i] += out * panLeft;
 			outputs[1][i] += out * panRight;
 
@@ -265,6 +283,9 @@ namespace WaveSabreCore
 		osc1.Integral = 0.0;
 		osc2.Integral = 0.0;
 		osc3.Integral = 0.0;
+
+		lfoOscillator.Phase = 0;
+		lfoOscillator.Integral = 0;
 
 		int noiseSeed = (int)(slaughter->noiseSeed * 0x10000);
 		if (noiseSeed == 0)
@@ -299,9 +320,15 @@ namespace WaveSabreCore
 		pitchEnv.Off();
 	}
 
+	
 	float Slaughter::SlaughterVoice::Oscillator::Next(double note, float waveform, float pulseWidth)
 	{
 		double phaseMax = Helpers::CurrentSampleRate * .5 / Helpers::NoteToFreq(note);
+		return NextPhaseMax(phaseMax, waveform, pulseWidth);
+	}
+
+	float Slaughter::SlaughterVoice::Oscillator::NextPhaseMax(double phaseMax, float waveform, float pulseWidth)
+	{
 		double dcOffset = -.498 / phaseMax;
 
 		double phase2 = fmod(Phase + 2.0 * phaseMax * (double)pulseWidth, phaseMax * 2.0) - phaseMax;

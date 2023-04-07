@@ -81,6 +81,10 @@ void SlaughterVst::getParameterName(VstInt32 index, char *text)
 	case Slaughter::ParamIndices::Rise: vst_strncpy(text, "Rise", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::VoiceMode: vst_strncpy(text, "Mode", kVstMaxParamStrLen); break;
 	case Slaughter::ParamIndices::SlideTime: vst_strncpy(text, "Slide", kVstMaxParamStrLen); break;
+	
+	case Slaughter::ParamIndices::LFOAmt: vst_strncpy(text, "LFO Amt", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::LFOWaveform: vst_strncpy(text, "LFO Wf", kVstMaxParamStrLen); break;
+	case Slaughter::ParamIndices::LFOPulseWidth: vst_strncpy(text, "LFO Pw", kVstMaxParamStrLen); break;
 	}
 }
 
