@@ -1,3 +1,4 @@
+#if 0
 #ifndef __WAVESABRECORE_THUNDER_H__
 #define __WAVESABRECORE_THUNDER_H__
 
@@ -42,4 +43,5 @@ namespace WaveSabreCore
 	};
 }
 
+#endif
 #endif

@@ -16,16 +16,7 @@ add_library(WaveSabrePlayerLib
 	src/WavWriter.cpp)
 
 target_link_libraries(WaveSabrePlayerLib
-	WaveSabreCore
-	winmm.lib
-	dsound.lib)
+	WaveSabreCore)
 
 target_include_directories(WaveSabrePlayerLib PUBLIC include)
 
-if(MSVC)
-	target_compile_definitions(WaveSabrePlayerLib PRIVATE _CRT_SECURE_NO_WARNINGS)
-	target_compile_options(WaveSabrePlayerLib PUBLIC
-		$<$<CONFIG:MinSizeRel>:/EHs-c->)
-	set_property(TARGET WaveSabrePlayerLib APPEND_STRING PROPERTY STATIC_LIBRARY_FLAGS_MINSIZEREL
-		" /LTCG")
-endif()

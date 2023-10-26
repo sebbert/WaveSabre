@@ -1,3 +1,4 @@
+#if 0
 #include <WaveSabrePlayerLib/CriticalSection.h>
 
 namespace WaveSabrePlayerLib
@@ -28,3 +29,4 @@ namespace WaveSabrePlayerLib
 		return CriticalSectionGuard(this);
 	}
 }
+#endif

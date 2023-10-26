@@ -1,3 +1,4 @@
+#if 0
 #include <WaveSabreCore/Deprecated/Thunder.h>
 #include <WaveSabreCore/Helpers.h>
 
@@ -89,3 +90,4 @@ namespace WaveSabreCore
 		samplePos = 0;
 	}
 }
+#endif

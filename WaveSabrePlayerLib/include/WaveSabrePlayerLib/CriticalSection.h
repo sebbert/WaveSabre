@@ -1,3 +1,4 @@
+#if 0
 #ifndef __WAVESABREPLAYERLIB_CRITICALSECTION__
 #define __WAVESABREPLAYERLIB_CRITICALSECTION__
 
@@ -28,4 +29,5 @@ namespace WaveSabrePlayerLib
 	};
 }
 
+#endif
 #endif

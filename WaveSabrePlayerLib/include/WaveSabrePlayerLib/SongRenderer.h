@@ -1,3 +1,4 @@
+#if 0
 #ifndef __WAVESABREPLAYERLIB_SONGRENDERER_H__
 #define __WAVESABREPLAYERLIB_SONGRENDERER_H__
 
@@ -194,4 +195,5 @@ namespace WaveSabrePlayerLib
 	};
 }
 
+#endif
 #endif

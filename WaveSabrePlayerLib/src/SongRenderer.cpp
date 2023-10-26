@@ -1,3 +1,4 @@
+#if 0
 #include <WaveSabrePlayerLib/SongRenderer.h>
 
 using namespace WaveSabreCore;
@@ -258,3 +259,4 @@ namespace WaveSabrePlayerLib
 		return ret;
 	}
 }
+#endif

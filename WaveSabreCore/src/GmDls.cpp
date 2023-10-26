@@ -1,3 +1,4 @@
+#if 0
 #include <WaveSabreCore/GmDls.h>
 
 #include <Windows.h>
@@ -28,3 +29,4 @@ namespace WaveSabreCore
 		return gmDls;
 	}
 }
+#endif

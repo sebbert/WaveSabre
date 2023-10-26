@@ -1,3 +1,4 @@
+#if 0
 #ifndef __WAVESABREPLAYERLIB_DIRECTSOUNDRENDERTHREAD_H__
 #define __WAVESABREPLAYERLIB_DIRECTSOUNDRENDERTHREAD_H__
 
@@ -39,4 +40,5 @@ namespace WaveSabrePlayerLib
 	};
 }
 
+#endif
 #endif

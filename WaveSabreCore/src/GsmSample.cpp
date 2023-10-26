@@ -1,3 +1,4 @@
+#if 0
 #include <WaveSabreCore/GsmSample.h>
 
 #include <string.h>
@@ -100,3 +101,4 @@ namespace WaveSabreCore
 		return 1;
 	}
 }
+#endif

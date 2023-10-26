@@ -1,3 +1,4 @@
+#if 0
 #include <WaveSabrePlayerLib/DirectSoundRenderThread.h>
 
 namespace WaveSabrePlayerLib
@@ -125,3 +126,4 @@ namespace WaveSabrePlayerLib
 		return 0;
 	}
 }
+#endif

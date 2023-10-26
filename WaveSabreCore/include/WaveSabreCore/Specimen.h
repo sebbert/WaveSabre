@@ -1,3 +1,4 @@
+#if 0
 #ifndef __WAVESABRECORE_SPECIMEN_H__
 #define __WAVESABRECORE_SPECIMEN_H__
 
@@ -114,4 +115,5 @@ namespace WaveSabreCore
 	};
 }
 
+#endif
 #endif
