@@ -1,4 +1,3 @@
-#if 0
 #include <WaveSabreCore/Specimen.h>
 #include <WaveSabreCore/Helpers.h>
 
@@ -334,4 +333,3 @@ namespace WaveSabreCore
 		samplePlayer.CalcPitch(GetNote() - 60 + Detune + specimen->fineTune * 2.0f - 1.0f + SpecimenVoice::coarseDetune(specimen->coarseTune));
 	}
 }
-#endif

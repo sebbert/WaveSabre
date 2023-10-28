@@ -1,4 +1,3 @@
-#if 0
 #ifndef __WAVESABRECORE_GSMSAMPLE_H__
 #define __WAVESABRECORE_GSMSAMPLE_H__
 
@@ -37,5 +36,4 @@ namespace WaveSabreCore
 	};
 }
 
-#endif
 #endif

@@ -1,5 +1,4 @@
 add_library(WaveSabreCore
-	include/WaveSabreCore/Adultery.h
 	include/WaveSabreCore/AllPass.h
 	include/WaveSabreCore/AllPassDelay.h
 	include/WaveSabreCore/BiquadFilter.h
@@ -13,8 +12,6 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Echo.h
 	include/WaveSabreCore/Envelope.h
 	include/WaveSabreCore/Falcon.h
-	include/WaveSabreCore/GmDls.h
-	include/WaveSabreCore/GsmSample.h
 	include/WaveSabreCore/Helpers.h
 	include/WaveSabreCore/Leveller.h
 	include/WaveSabreCore/MxcsrFlagGuard.h
@@ -23,12 +20,15 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Scissor.h
 	include/WaveSabreCore/Slaughter.h
 	include/WaveSabreCore/Smasher.h
-	include/WaveSabreCore/Specimen.h
 	include/WaveSabreCore/StateVariableFilter.h
 	include/WaveSabreCore/SynthDevice.h
 	include/WaveSabreCore/Twister.h
-	include/WaveSabreCore/Deprecated/Thunder.h
-	src/Adultery.cpp
+  #include/WaveSabreCore/Adultery.h
+	#include/WaveSabreCore/GmDls.h
+	#include/WaveSabreCore/GsmSample.h
+	#include/WaveSabreCore/Specimen.h
+	#include/WaveSabreCore/Deprecated/Thunder.h
+
 	src/AllPass.cpp
 	src/AllPassDelay.cpp
 	src/BiquadFilter.cpp
@@ -41,8 +41,6 @@ add_library(WaveSabreCore
 	src/Echo.cpp
 	src/Envelope.cpp
 	src/Falcon.cpp
-	src/GmDls.cpp
-	src/GsmSample.cpp
 	src/Helpers.cpp
 	src/Leveller.cpp
 	src/MxcsrFlagGuard.cpp
@@ -51,11 +49,21 @@ add_library(WaveSabreCore
 	src/Scissor.cpp
 	src/Slaughter.cpp
 	src/Smasher.cpp
-	src/Specimen.cpp
 	src/StateVariableFilter.cpp
 	src/SynthDevice.cpp
 	src/Twister.cpp
-	src/Deprecated/Thunder.cpp)
+  src/Main.cpp
+  src/NewImpl.cpp
+
+  # src/Adultery.cpp
+  # src/GmDls.cpp
+	# src/GsmSample.cpp
+  # src/Specimen.cpp
+  # src/Deprecated/Thunder.cpp
+)
+
+
+set(CMAKE_CXX_FLAGS "-flto -O3 -Os -g")
 
 target_link_libraries(WaveSabreCore)
 target_include_directories(WaveSabreCore PUBLIC include)

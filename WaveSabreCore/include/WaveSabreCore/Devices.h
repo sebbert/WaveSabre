@@ -3,8 +3,6 @@
 
 #include "Falcon.h"
 #include "Slaughter.h"
-#include "Adultery.h"
-#include "Specimen.h"
 
 #include "Scissor.h"
 #include "Leveller.h"
@@ -15,6 +13,10 @@
 #include "Twister.h"
 #include "Cathedral.h"
 
+#if ENABLE_GMDLS
+#include "Adultery.h"
+#include "Specimen.h"
 #include "Deprecated/Thunder.h"
+#endif
 
 #endif

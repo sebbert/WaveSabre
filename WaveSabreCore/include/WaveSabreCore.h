@@ -12,9 +12,12 @@
 #include "WaveSabreCore/AllPassDelay.h"
 #include "WaveSabreCore/Comb.h"
 #include "WaveSabreCore/ResampleBuffer.h"
-#include "WaveSabreCore/GmDls.h"
 #include "WaveSabreCore/MxcsrFlagGuard.h"
 
 #include "WaveSabreCore/Devices.h"
+
+#if ENABLE_GMDLS
+#include "WaveSabreCore/GmDls.h"
+#endif
 
 #endif

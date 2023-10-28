@@ -1,4 +1,3 @@
-#if 0
 #ifndef __WAVESABRECORE_GMDLS_H__
 #define __WAVESABRECORE_GMDLS_H__
 
@@ -14,5 +13,4 @@ namespace WaveSabreCore
 	};
 }
 
-#endif
 #endif
