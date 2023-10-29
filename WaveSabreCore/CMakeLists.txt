@@ -63,7 +63,7 @@ add_library(WaveSabreCore
 )
 
 
-set(CMAKE_CXX_FLAGS "-flto -O3 -Os -g")
+set(CMAKE_CXX_FLAGS "-flto -Os -msimd128")
 
 target_link_libraries(WaveSabreCore)
 target_include_directories(WaveSabreCore PUBLIC include)
