@@ -52,7 +52,7 @@ add_library(WaveSabreCore
 	src/StateVariableFilter.cpp
 	src/SynthDevice.cpp
 	src/Twister.cpp
-  src/Main.cpp
+#   src/Main.cpp
   src/NewImpl.cpp
 
   # src/Adultery.cpp
@@ -63,7 +63,6 @@ add_library(WaveSabreCore
 )
 
 
-set(CMAKE_CXX_FLAGS "-flto -Os -msimd128")
 
 target_link_libraries(WaveSabreCore)
 target_include_directories(WaveSabreCore PUBLIC include)
