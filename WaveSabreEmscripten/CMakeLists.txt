@@ -1,5 +1,4 @@
 add_executable(WaveSabreEmscripten
-	source/Main.js
 	source/Main.cpp
 	source/SongRenderer.cpp
 	source/SongRenderer.Track.cpp
@@ -8,22 +7,27 @@ add_executable(WaveSabreEmscripten
 	include/WaveSabreEmscripten/SongRenderer.h
 )
 
-set_source_files_properties(source/Main.js PROPERTIES HEADER_FILE_ONLY TRUE)
-
-add_custom_target(MainJs DEPENDS source/Main.js)
-add_dependencies(WaveSabreEmscripten MainJs)
-
 target_include_directories(WaveSabreEmscripten PUBLIC include)
 
 target_link_libraries(WaveSabreEmscripten
 	WaveSabreCore)
 
+set(EMSCRIPTEN_EXPORTED_FUNCTIONS
+	"_main"
+	"_WaveSabre_CreateBuffer"
+	"_WaveSabre_DestroyBuffer"
+	"_WaveSabre_CreateSongRenderer"
+	"_WaveSabre_DestroySongRenderer"
+	"_WaveSabre_RenderSamples"
+)
+
+string(JOIN "," EMSCRIPTEN_EXPORTED_FUNCTIONS_ARG ${EMSCRIPTEN_EXPORTED_FUNCTIONS})
+
 target_link_options(WaveSabreEmscripten PRIVATE
-	"--post-js" "${CMAKE_CURRENT_SOURCE_DIR}/source/Main.js"
 	"-gsource-map"
 	"-sWASM=1"
-	"-sEXPORTED_FUNCTIONS=_main,_renderSong"
-	"-sEXPORTED_RUNTIME_METHODS=ccall,cwrap"
+	"-sEXPORTED_FUNCTIONS=${EMSCRIPTEN_EXPORTED_FUNCTIONS_ARG}"
+	"-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,addOnPostRun"
 )
-set_target_properties(WaveSabreEmscripten PROPERTIES SUFFIX ".html")
+set_target_properties(WaveSabreEmscripten PROPERTIES SUFFIX ".js")
 

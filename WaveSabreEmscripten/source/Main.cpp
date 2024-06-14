@@ -6,21 +6,40 @@
 
 using namespace WaveSabreCore;
 using namespace WaveSabrePlayerLib;
+
 #include <WaveSabreEmscripten/Song.h>
 
-SongRenderer songRenderer(&Song, 1);
+using Sample = SongRenderer::Sample;
 
 extern "C"
 {
-	EMSCRIPTEN_KEEPALIVE void renderSong(void* buffer, int sampleCount) {
-		auto tmpBuffer = new SongRenderer::Sample[sampleCount];
-		songRenderer.RenderSamples(tmpBuffer, sampleCount);
-		memcpy(buffer, tmpBuffer, sampleCount * sizeof(*tmpBuffer));
-		delete[] tmpBuffer;
+	EMSCRIPTEN_KEEPALIVE
+	Sample* WaveSabre_CreateBuffer(size_t len) {
+		return new Sample[len];
 	}
 
-	EMSCRIPTEN_KEEPALIVE int main() {
-		EM_ASM( playSong() );
+	EMSCRIPTEN_KEEPALIVE
+	void WaveSabre_DestroyBuffer(Sample* buffer) {
+		delete[] buffer;
+	}
+
+	EMSCRIPTEN_KEEPALIVE
+	SongRenderer* WaveSabre_CreateSongRenderer() {
+		return new SongRenderer(&Song, 1);
+	}
+
+	EMSCRIPTEN_KEEPALIVE
+	void WaveSabre_DestroySongRenderer(SongRenderer* renderer) {
+		delete renderer;
+	}
+
+	EMSCRIPTEN_KEEPALIVE
+	void WaveSabre_RenderSamples(SongRenderer* renderer, Sample* buffer, size_t len) {
+		renderer->RenderSamples(buffer, len);
+	}
+
+	EMSCRIPTEN_KEEPALIVE
+	int main() {
 		return 0;
 	}
 }
