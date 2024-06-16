@@ -1,5 +1,5 @@
 #include <WaveSabreCore.h>
-#include <WaveSabrePlayerLib.h>
+#include <WaveSabreEmscripten/SongRenderer.h>
 
 WaveSabreCore::Device *SongFactory(SongRenderer::DeviceId id)
 {
