@@ -27,7 +27,6 @@ target_link_options(WaveSabreEmscripten PRIVATE
 	"-gsource-map"
 	"-sWASM=1"
 	"-sEXPORTED_FUNCTIONS=${EMSCRIPTEN_EXPORTED_FUNCTIONS_ARG}"
-	"-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,addOnPostRun"
 )
 set_target_properties(WaveSabreEmscripten PROPERTIES SUFFIX ".js")
 
