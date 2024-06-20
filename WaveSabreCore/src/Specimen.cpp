@@ -1,7 +1,10 @@
 #include <WaveSabreCore/Specimen.h>
+#include <WaveSabreCore/GsmSample.h>
+#include <WaveSabreCore/FfmpegSample.h>
 #include <WaveSabreCore/Helpers.h>
 
 #include <math.h>
+#include <assert.h>
 
 namespace WaveSabreCore
 {
@@ -142,18 +145,36 @@ namespace WaveSabreCore
 	{
 		if (!size) return;
 
-		// Read header
+		// Read chunk header
 		auto headerPtr = (ChunkHeader *)data;
 		auto headerSize = sizeof(ChunkHeader);
-
-		// Read wave format
-		auto waveFormatPtr = (WAVEFORMATEX *)((char *)data + headerSize);
-		auto waveFormatSize = sizeof(WAVEFORMATEX) + waveFormatPtr->cbSize;
-
-		// Read compressed data and load sample
-		auto compressedDataPtr = (char *)waveFormatPtr + waveFormatSize;
+		auto uncompressedDataSize = headerPtr->UncompressedSize;
 		auto compressedDataSize = headerPtr->CompressedSize;
-		LoadSample(compressedDataPtr, headerPtr->CompressedSize, headerPtr->UncompressedSize, waveFormatPtr);
+
+		// Read format header
+		auto formatHeaderPtr = (SampleFormatHeader *)((char *)data + headerSize);
+		char *compressedDataPtr;
+		if (formatHeaderPtr->Tag == SampleFormat::kTag)
+		{
+			// Read sample format
+			auto sampleFormatPtr = &formatHeaderPtr->SampleFormat;
+			auto sampleFormatSize = sampleFormatPtr->Size;
+
+			// Read compressed data and load sample
+			compressedDataPtr = (char*)sampleFormatPtr + sampleFormatSize;
+			LoadSample(compressedDataPtr, compressedDataSize, uncompressedDataSize, sampleFormatPtr);
+		}
+		else 
+		{
+			// Read wave format
+			auto waveFormatPtr = &formatHeaderPtr->WaveFormat;
+			auto waveFormatSize = sizeof(WAVEFORMATEX) + waveFormatPtr->cbSize;
+
+			// Read compressed data and load sample
+			compressedDataPtr = (char *)waveFormatPtr + waveFormatSize;
+			LoadGsmSample(compressedDataPtr, compressedDataSize, uncompressedDataSize, waveFormatPtr);
+		}
+
 
 		// Read params
 		//  The rest of the data from the start of the params until the end of the chunk
@@ -179,7 +200,7 @@ namespace WaveSabreCore
 		// Figure out size of chunk
 		//  The names here are meant to be symmetric with those in SetChunk for clarity
 		auto headerSize = sizeof(ChunkHeader);
-		auto waveFormatSize = sizeof(WAVEFORMATEX) + ((WAVEFORMATEX *)sample->WaveFormatData)->cbSize;
+		auto waveFormatSize = sizeof(WAVEFORMATEX) + sample->FormatHeader->WaveFormat.cbSize;
 		auto compressedDataSize = sample->CompressedSize;
 		auto paramSize = (int)ParamIndices::NumParams * sizeof(float);
 		auto chunkSizeSize = sizeof(int);
@@ -197,7 +218,7 @@ namespace WaveSabreCore
 
 		// Write wave format
 		auto waveFormatPtr = (char *)chunkData + headerSize;
-		memcpy(waveFormatPtr, sample->WaveFormatData, waveFormatSize);
+		memcpy(waveFormatPtr, &sample->FormatHeader->WaveFormat, waveFormatSize);
 
 		// Write compressed data
 		auto compressedDataPtr = waveFormatPtr + waveFormatSize;
@@ -216,11 +237,23 @@ namespace WaveSabreCore
 		return size;
 	}
 
-	void Specimen::LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr)
+
+
+	void Specimen::LoadGsmSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr)
 	{
 		if (sample) delete sample;
 
 		sample = new GsmSample(compressedDataPtr, compressedSize, uncompressedSize, waveFormatPtr);
+
+		sampleLoopStart = 0;
+		sampleLoopLength = sample->SampleLength;
+	}
+	
+	void Specimen::LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, SampleFormat *sampleFormatPtr)
+	{
+		if (sample) delete sample;
+
+		sample = new FfmpegSample(compressedDataPtr, compressedSize, uncompressedSize, sampleFormatPtr);
 
 		sampleLoopStart = 0;
 		sampleLoopLength = sample->SampleLength;

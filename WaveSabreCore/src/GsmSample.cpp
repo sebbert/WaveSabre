@@ -5,14 +5,8 @@
 namespace WaveSabreCore
 {
 	GsmSample::GsmSample(char *data, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormat)
-		: CompressedSize(compressedSize)
-		, UncompressedSize(uncompressedSize)
+		: UncompressedSample(data, compressedSize, uncompressedSize, (SampleFormatHeader *)waveFormat, sizeof(WAVEFORMATEX) + waveFormat->cbSize)
 	{
-		WaveFormatData = new char[sizeof(WAVEFORMATEX) + waveFormat->cbSize];
-		memcpy(WaveFormatData, waveFormat, sizeof(WAVEFORMATEX) + waveFormat->cbSize);
-		CompressedData = new char[compressedSize];
-		memcpy(CompressedData, data, compressedSize);
-
 		acmDriverEnum(driverEnumCallback, NULL, NULL);
 		HACMDRIVER driver = NULL;
 		acmDriverOpen(&driver, driverId, 0);
@@ -46,19 +40,10 @@ namespace WaveSabreCore
 		acmStreamClose(stream, 0);
 		acmDriverClose(driver, 0);
 
-		SampleLength = streamHeader.cbDstLengthUsed / sizeof(short);
-		SampleData = new float[SampleLength];
 		for (int i = 0; i < SampleLength; i++)
 			SampleData[i] = (float)((double)uncompressedData[i] / 32768.0);
 
 		delete [] uncompressedData;
-	}
-
-	GsmSample::~GsmSample()
-	{
-		delete [] WaveFormatData;
-		delete [] CompressedData;
-		delete [] SampleData;
 	}
 
 	HACMDRIVERID GsmSample::driverId = NULL;

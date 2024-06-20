@@ -189,7 +189,7 @@ void SpecimenEditor::setParameter(VstInt32 index, float value)
 					acmStreamClose(stream, 0);
 					acmDriverClose(driver, 0);
 
-					specimen->LoadSample(compressedData, streamHeader.cbDstLengthUsed, chunkSizeBytes, waveFormat);
+					specimen->LoadGsmSample(compressedData, streamHeader.cbDstLengthUsed, chunkSizeBytes, waveFormat);
 
 					delete [] (char *)waveFormat;
 

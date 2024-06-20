@@ -2,6 +2,7 @@
 #define __WAVESABRECORE_GSMSAMPLE_H__
 
 #include "Helpers.h"
+#include "UncompressedSample.h"
 
 #include <Windows.h>
 
@@ -14,19 +15,11 @@
 
 namespace WaveSabreCore
 {
-	class GsmSample
+
+	class GsmSample : public UncompressedSample
 	{
 	public:
 		GsmSample(char *data, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormat);
-		~GsmSample();
-
-		char *WaveFormatData;
-		int CompressedSize, UncompressedSize;
-
-		char *CompressedData;
-		float *SampleData;
-
-		int SampleLength;
 
 	private:
 		static BOOL __stdcall driverEnumCallback(HACMDRIVERID driverId, DWORD_PTR dwInstance, DWORD fdwSupport);

@@ -31,6 +31,9 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Barley.h
 	include/WaveSabreCore/Vectron.h
 	include/WaveSabreCore/Random.h
+	include/WaveSabreCore/SampleFormat.h
+	include/WaveSabreCore/UncompressedSample.h
+	include/WaveSabreCore/FfmpegSample.h
 	include/WaveSabreCore/Deprecated/Thunder.h
 	src/Adultery.cpp
 	src/AllPass.cpp
@@ -63,6 +66,8 @@ add_library(WaveSabreCore
 	src/Barley.cpp
 	src/Vectron.cpp
 	src/Random.cpp
+	src/UncompressedSample.cpp
+	src/FfmpegSample.cpp
 	src/Deprecated/Thunder.cpp)
 
 target_link_libraries(WaveSabreCore Msacm32.lib)

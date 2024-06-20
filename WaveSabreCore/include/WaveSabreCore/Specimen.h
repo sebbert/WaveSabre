@@ -5,7 +5,8 @@
 #include "Envelope.h"
 #include "StateVariableFilter.h"
 #include "SamplePlayer.h"
-#include "GsmSample.h"
+#include "UncompressedSample.h"
+#include "SampleFormat.h"
 
 namespace WaveSabreCore
 {
@@ -63,7 +64,8 @@ namespace WaveSabreCore
 		virtual void SetChunk(void *data, int size);
 		virtual int GetChunk(void **data);
 
-		void LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr);
+		void LoadGsmSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr);
+		void LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, SampleFormat *formatPtr);
 
 	private:
 		class SpecimenVoice : public Voice
@@ -94,7 +96,7 @@ namespace WaveSabreCore
 
 		char *chunkData;
 
-		GsmSample* sample;
+		UncompressedSample* sample;
 
 		float ampAttack, ampDecay, ampSustain, ampRelease;
 		float sampleStart;
