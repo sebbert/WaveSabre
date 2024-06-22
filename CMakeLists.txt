@@ -19,7 +19,7 @@ endif()
 
 if(EMSCRIPTEN)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msimd128")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Oz -fno-rtti -fno-exceptions")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -fno-rtti -fno-exceptions")
 endif()
 
 set(BUILD_VST_PLUGINS ON CACHE BOOL "Opt out of building the VST plugins.")
