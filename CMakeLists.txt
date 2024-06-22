@@ -1,16 +1,25 @@
-project("WaveSabre" LANGUAGES C CXX CSharp)
-
-# Enable C# Utilities also for the VS2013 AppVeyor stage.
-cmake_policy(SET CMP0057 NEW)
-include(CSharpUtilities)
-set(CMAKE_CSharp_FLAGS ${CMAKE_CSharp_FLAGS} "/langversion:6")
-
 cmake_minimum_required(VERSION 3.11)
+project("WaveSabre" LANGUAGES C CXX)
+
+if(NOT EMSCRIPTEN)
+	enable_language(CSharp)
+
+	# Enable C# Utilities also for the VS2013 AppVeyor stage.
+	cmake_policy(SET CMP0057 NEW)
+	include(CSharpUtilities)
+	set(CMAKE_CSharp_FLAGS ${CMAKE_CSharp_FLAGS} "/langversion:6")
+endif()
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(MSVC)
 	# disable exceptions globally (will be added back for VSTs)
 	string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+endif()
+
+if(EMSCRIPTEN)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msimd128")
+	set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -Oz -fno-rtti -fno-exceptions")
 endif()
 
 set(BUILD_VST_PLUGINS ON CACHE BOOL "Opt out of building the VST plugins.")
@@ -34,32 +43,36 @@ if(${BUILD_VST_PLUGINS} AND ${DOWNLOAD_VST3SDK})
 endif()
 
 # shared code
-add_subdirectory(MSVCRT)
 add_subdirectory(WaveSabreCore)
-add_subdirectory(WaveSabrePlayerLib)
 
-# binaries
-add_subdirectory(Tests/PlayerTest)
-add_subdirectory(WaveSabreStandAlonePlayer)
+if(NOT EMSCRIPTEN)
+	# shared code
+	add_subdirectory(MSVCRT)
+	add_subdirectory(WaveSabrePlayerLib)
 
-# VSTs
-if(${BUILD_VST_PLUGINS} AND VSTSDK3_DIR)
-	add_subdirectory(WaveSabreVstLib)
-	add_subdirectory(Vsts)
-endif()
+	# binaries
+	add_subdirectory(Tests/PlayerTest)
+	add_subdirectory(WaveSabreStandAlonePlayer)
 
-# Project file conversions
-if(${BUILD_WAVESABRE_CONVERT})
-	add_subdirectory(WaveSabreConvert)
-endif()
-if(${BUILD_WAVESABRE_CONVERT_TESTS})
-	add_subdirectory(Tests/WaveSabreConvertTests)
-endif()
-if(${BUILD_CONVERT_THE_FUCK})
-	add_subdirectory(ConvertTheFuck)
-endif()
+	# VSTs
+	if(${BUILD_VST_PLUGINS} AND VSTSDK3_DIR)
+		add_subdirectory(WaveSabreVstLib)
+		add_subdirectory(Vsts)
+	endif()
 
-# Project manager
-if(${BUILD_PROJECT_MANAGER})
-	add_subdirectory(ProjectManager)
+	# Project file conversions
+	if(${BUILD_WAVESABRE_CONVERT})
+		add_subdirectory(WaveSabreConvert)
+	endif()
+	if(${BUILD_WAVESABRE_CONVERT_TESTS})
+		add_subdirectory(Tests/WaveSabreConvertTests)
+	endif()
+	if(${BUILD_CONVERT_THE_FUCK})
+		add_subdirectory(ConvertTheFuck)
+	endif()
+
+	# Project manager
+	if(${BUILD_PROJECT_MANAGER})
+		add_subdirectory(ProjectManager)
+	endif()
 endif()

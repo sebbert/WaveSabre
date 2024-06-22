@@ -1,5 +1,4 @@
 add_library(WaveSabreCore
-	include/WaveSabreCore/Adultery.h
 	include/WaveSabreCore/AllPass.h
 	include/WaveSabreCore/AllPassDelay.h
 	include/WaveSabreCore/BiquadFilter.h
@@ -13,8 +12,6 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Echo.h
 	include/WaveSabreCore/Envelope.h
 	include/WaveSabreCore/Falcon.h
-	include/WaveSabreCore/GmDls.h
-	include/WaveSabreCore/GsmSample.h
 	include/WaveSabreCore/Helpers.h
 	include/WaveSabreCore/Leveller.h
 	include/WaveSabreCore/MxcsrFlagGuard.h
@@ -33,9 +30,7 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Random.h
 	include/WaveSabreCore/SampleFormat.h
 	include/WaveSabreCore/UncompressedSample.h
-	include/WaveSabreCore/FfmpegSample.h
-	include/WaveSabreCore/Deprecated/Thunder.h
-	src/Adultery.cpp
+	include/WaveSabreCore/ExternalSample.h
 	src/AllPass.cpp
 	src/AllPassDelay.cpp
 	src/BiquadFilter.cpp
@@ -48,8 +43,6 @@ add_library(WaveSabreCore
 	src/Echo.cpp
 	src/Envelope.cpp
 	src/Falcon.cpp
-	src/GmDls.cpp
-	src/GsmSample.cpp
 	src/Helpers.cpp
 	src/Leveller.cpp
 	src/MxcsrFlagGuard.cpp
@@ -67,11 +60,26 @@ add_library(WaveSabreCore
 	src/Vectron.cpp
 	src/Random.cpp
 	src/UncompressedSample.cpp
-	src/FfmpegSample.cpp
-	src/Deprecated/Thunder.cpp)
+	src/ExternalSample.cpp)
 
-target_link_libraries(WaveSabreCore Msacm32.lib)
 target_include_directories(WaveSabreCore PUBLIC include)
+
+if (WIN32)
+	target_sources(WaveSabreCore PRIVATE
+		include/WaveSabreCore/Adultery.h
+		include/WaveSabreCore/GmDls.h
+		include/WaveSabreCore/GsmSample.h
+		include/WaveSabreCore/FfmpegSample.h
+		include/WaveSabreCore/Deprecated/Thunder.h
+		src/Adultery.cpp
+		src/GmDls.cpp
+		src/GsmSample.cpp
+		src/FfmpegSample.cpp
+		src/Deprecated/Thunder.cpp
+	)
+
+	target_link_libraries(WaveSabreCore Msacm32.lib)
+endif()
 
 if(MSVC)
 	target_compile_options(WaveSabreCore

@@ -8,7 +8,7 @@
 #include <WaveSabreCore/Helpers.h>
 
 #include <math.h>
-#include <assert.h>
+#include <string.h>
 
 namespace WaveSabreCore
 {
@@ -226,7 +226,7 @@ namespace WaveSabreCore
 
 		// Write wave format
 		auto waveFormatPtr = (char *)chunkData + headerSize;
-		memcpy(waveFormatPtr, &sample->FormatHeader->WaveFormat, waveFormatSize);
+		memcpy(waveFormatPtr, &sample->FormatHeader, waveFormatSize);
 
 		// Write compressed data
 		auto compressedDataPtr = waveFormatPtr + waveFormatSize;
