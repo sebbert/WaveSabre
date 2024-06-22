@@ -11,7 +11,6 @@ namespace WaveSabreCore
 		UncompressedSample(
 			char *compressedData,
 			int compressedSize,
-			int uncompressedSize,
 			SampleFormatHeader *formatHeader,
 			int formatSize
 		);

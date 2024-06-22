@@ -162,7 +162,7 @@ namespace WaveSabreCore
 
 			// Read compressed data and load sample
 			compressedDataPtr = (char*)sampleFormatPtr + sampleFormatSize;
-			LoadSample(compressedDataPtr, compressedDataSize, uncompressedDataSize, sampleFormatPtr);
+			LoadBlobSample(compressedDataPtr, compressedDataSize, sampleFormatPtr);
 		}
 		else 
 		{
@@ -200,11 +200,11 @@ namespace WaveSabreCore
 		// Figure out size of chunk
 		//  The names here are meant to be symmetric with those in SetChunk for clarity
 		auto headerSize = sizeof(ChunkHeader);
-		auto waveFormatSize = sizeof(WAVEFORMATEX) + sample->FormatHeader->WaveFormat.cbSize;
+		auto waveFormatSize = sample->FormatHeaderSize;
 		auto compressedDataSize = sample->CompressedSize;
 		auto paramSize = (int)ParamIndices::NumParams * sizeof(float);
 		auto chunkSizeSize = sizeof(int);
-		int size = (int)(headerSize + waveFormatSize + sample->CompressedSize + paramSize + chunkSizeSize);
+		int size = (int)(headerSize + waveFormatSize + compressedDataSize + paramSize + chunkSizeSize);
 
 		// (Re)allocate chunk data
 		if (chunkData) delete [] chunkData;
@@ -249,11 +249,11 @@ namespace WaveSabreCore
 		sampleLoopLength = sample->SampleLength;
 	}
 	
-	void Specimen::LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, SampleFormat *sampleFormatPtr)
+	void Specimen::LoadBlobSample(char *compressedDataPtr, int compressedSize, SampleFormat *sampleFormatPtr)
 	{
 		if (sample) delete sample;
 
-		sample = new FfmpegSample(compressedDataPtr, compressedSize, uncompressedSize, sampleFormatPtr);
+		sample = new FfmpegSample(compressedDataPtr, compressedSize, sampleFormatPtr);
 
 		sampleLoopStart = 0;
 		sampleLoopLength = sample->SampleLength;

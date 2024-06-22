@@ -51,6 +51,10 @@ namespace WaveSabreCore
 			SlideTime,
 
 			NumParams,
+
+			// Editor only:
+			LoadGsmSample = 1000,
+			LoadBlobSample = 1001,
 		};
 
 		static const int SampleRate = 44100;
@@ -65,7 +69,7 @@ namespace WaveSabreCore
 		virtual int GetChunk(void **data);
 
 		void LoadGsmSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr);
-		void LoadSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, SampleFormat *formatPtr);
+		void LoadBlobSample(char *compressedDataPtr, int compressedSize, SampleFormat *formatPtr);
 
 	private:
 		class SpecimenVoice : public Voice

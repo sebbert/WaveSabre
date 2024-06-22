@@ -1,10 +1,21 @@
 #ifndef __WAVESABRECORE_WAVEFORMAT_H__
 #define __WAVESABRECORE_WAVEFORMAT_H__
 
+#include <Windows.h>
+
+#ifndef UNICODE
+#define _UNICODE
+#endif
+
 #include <mmreg.h>
 
 namespace WaveSabreCore
 {
+	enum class SampleFormatType : unsigned int
+	{
+		Blob = 0,
+	};
+
 	struct SampleFormat
 	{
 		// Version 0:
@@ -15,11 +26,6 @@ namespace WaveSabreCore
 
 		static constexpr unsigned short kTag = 0;
 		static constexpr unsigned short kVersion = 0;
-	};
-	
-	enum SampleFormatType : unsigned int
-	{
-		Blob = 0,
 	};
 
 	// Following ChunkHeader is either a WAVEFORMATEX or SampleFormat.

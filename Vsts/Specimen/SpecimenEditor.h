@@ -24,7 +24,11 @@ private:
 	static HACMDRIVERID driverId;
 	static WAVEFORMATEX *foundWaveFormat;
 
-	bool pressedTheFuck;
+	bool pressedLoadGsmSample;
+	bool pressedLoadBlobSample;
+
+	void LoadGsmSample();
+	void LoadBlobSample();
 
 	CFileSelector *fileSelector;
 

@@ -1,5 +1,6 @@
 #include <WaveSabreCore/Deprecated/Thunder.h>
 #include <WaveSabreCore/Helpers.h>
+#include <WaveSabreCore/SampleFormat.h>
 
 namespace WaveSabreCore
 {
@@ -40,11 +41,15 @@ namespace WaveSabreCore
 		h.CompressedSize = sample->CompressedSize;
 		h.UncompressedSize = sample->UncompressedSize;
 		if (chunkData) delete [] chunkData;
-		int chunkSize = sizeof(ChunkHeader) + sizeof(WAVEFORMATEX) + ((WAVEFORMATEX *)sample->WaveFormatData)->cbSize + sample->CompressedSize + sizeof(int);
+
+		auto waveFormat = &sample->FormatHeader->WaveFormat;
+		auto waveFormatSize = sample->FormatHeaderSize;
+
+		int chunkSize = sizeof(ChunkHeader) + sample->FormatHeaderSize + sample->CompressedSize + sizeof(int);
 		chunkData = new char[chunkSize];
 		memcpy(chunkData, &h, sizeof(ChunkHeader));
-		memcpy(chunkData + sizeof(ChunkHeader), sample->WaveFormatData, sizeof(WAVEFORMATEX) + ((WAVEFORMATEX *)sample->WaveFormatData)->cbSize);
-		memcpy(chunkData + sizeof(ChunkHeader) + sizeof(WAVEFORMATEX) + ((WAVEFORMATEX *)sample->WaveFormatData)->cbSize, sample->CompressedData, sample->CompressedSize);
+		memcpy(chunkData + sizeof(ChunkHeader), waveFormat, waveFormatSize);
+		memcpy(chunkData + sizeof(ChunkHeader) + waveFormatSize, sample->CompressedData, sample->CompressedSize);
 		*(int *)(chunkData + chunkSize - sizeof(int)) = chunkSize;
 		*data = chunkData;
 		return chunkSize;
