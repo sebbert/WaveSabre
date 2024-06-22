@@ -45,7 +45,9 @@ endif()
 # shared code
 add_subdirectory(WaveSabreCore)
 
-if(NOT EMSCRIPTEN)
+if (EMSCRIPTEN)
+	add_subdirectory(WaveSabreEmscripten)
+else()
 	# shared code
 	add_subdirectory(MSVCRT)
 	add_subdirectory(WaveSabrePlayerLib)
