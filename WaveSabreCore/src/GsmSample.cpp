@@ -42,7 +42,7 @@ namespace WaveSabreCore
 		acmStreamClose(stream, 0);
 		acmDriverClose(driver, 0);
 
-		SampleLength = uncompressedSize / (int)sizeof(float);
+		SampleLength = uncompressedSize / (int)sizeof(short);
 		SampleData = new float[SampleLength];
 
 		for (int i = 0; i < SampleLength; i++)
