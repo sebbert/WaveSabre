@@ -3,7 +3,6 @@
 
 #include "Falcon.h"
 #include "Slaughter.h"
-#include "Adultery.h"
 #include "Specimen.h"
 
 #include "Scissor.h"
@@ -18,6 +17,9 @@
 #include "Barley.h"
 #include "Vectron.h"
 
+#ifdef _WIN32
+#include "Adultery.h"
 #include "Deprecated/Thunder.h"
+#endif
 
 #endif
