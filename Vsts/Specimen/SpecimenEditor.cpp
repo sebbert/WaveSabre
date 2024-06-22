@@ -33,12 +33,9 @@ void SpecimenEditor::Open()
 {
 	if (!fileSelector) fileSelector = new CFileSelector(nullptr);
 
+	addButton((int)Specimen::ParamIndices::LoadGsmSample, "LOAD GSM");
 	addSpacer();
-	addButton((int)Specimen::ParamIndices::LoadGsmSample, "LOAD GSM SAMPLE");
-	addSpacer();
-	addSpacer();
-	addSpacer();
-	addButton((int)Specimen::ParamIndices::LoadBlobSample, "LOAD BLOB SAMPLE");
+	addButton((int)Specimen::ParamIndices::LoadBlobSample, "LOAD BLOB");
 	addSpacer();
 
 	startNextRow();
@@ -249,7 +246,7 @@ void SpecimenEditor::LoadBlobSample()
 			sampleFormat.Size = sizeof(sampleFormat);
 			sampleFormat.Type = SampleFormatType::Blob;
 
-			specimen->LoadBlobSample(inputBuf, inputSize, &sampleFormat);
+			specimen->LoadBlobSample(inputBuf, (int)inputSize, &sampleFormat);
 
 			delete [] inputBuf;
 		}
