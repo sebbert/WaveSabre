@@ -64,6 +64,10 @@ add_library(WaveSabreCore
 
 target_include_directories(WaveSabreCore PUBLIC include)
 
+if (EMSCRIPTEN)
+	target_sources(WaveSabreCore PRIVATE src/NewImpl.cpp)
+endif()
+
 if (WIN32)
 	target_sources(WaveSabreCore PRIVATE
 		include/WaveSabreCore/Adultery.h
