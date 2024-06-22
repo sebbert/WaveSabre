@@ -22,8 +22,8 @@ namespace WaveSabreCore
 
 	UncompressedSample::~UncompressedSample()
 	{
-		delete [] (char *)FormatHeader;
 		delete [] CompressedData;
+		delete [] (char *)FormatHeader;
 
 		if (SampleData) delete [] SampleData;
 	}
