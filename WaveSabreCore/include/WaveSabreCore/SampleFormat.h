@@ -1,13 +1,15 @@
 #ifndef __WAVESABRECORE_WAVEFORMAT_H__
 #define __WAVESABRECORE_WAVEFORMAT_H__
 
-#include <Windows.h>
+#ifdef _WIN32
+	#include <Windows.h>
 
-#ifndef UNICODE
-#define _UNICODE
+	#ifndef UNICODE
+		#define _UNICODE
+	#endif
+
+	#include <mmreg.h>
 #endif
-
-#include <mmreg.h>
 
 namespace WaveSabreCore
 {
@@ -34,8 +36,11 @@ namespace WaveSabreCore
 	union SampleFormatHeader
 	{
 		unsigned short Tag;
-		WAVEFORMATEX WaveFormat;
 		SampleFormat SampleFormat;
+
+#ifdef _WIN32
+		WAVEFORMATEX WaveFormat;
+#endif
 	};
 }
 

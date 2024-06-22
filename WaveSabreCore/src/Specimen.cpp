@@ -1,5 +1,9 @@
 #include <WaveSabreCore/Specimen.h>
+
+#ifdef _WIN32
 #include <WaveSabreCore/GsmSample.h>
+#endif
+
 #include <WaveSabreCore/FfmpegSample.h>
 #include <WaveSabreCore/Helpers.h>
 
@@ -166,6 +170,9 @@ namespace WaveSabreCore
 		}
 		else 
 		{
+#ifndef _WIN32
+			return;
+#else
 			// Read wave format
 			auto waveFormatPtr = &formatHeaderPtr->WaveFormat;
 			auto waveFormatSize = sizeof(WAVEFORMATEX) + waveFormatPtr->cbSize;
@@ -173,6 +180,7 @@ namespace WaveSabreCore
 			// Read compressed data and load sample
 			compressedDataPtr = (char *)waveFormatPtr + waveFormatSize;
 			LoadGsmSample(compressedDataPtr, compressedDataSize, uncompressedDataSize, waveFormatPtr);
+#endif
 		}
 
 
@@ -237,8 +245,7 @@ namespace WaveSabreCore
 		return size;
 	}
 
-
-
+#ifdef _WIN32
 	void Specimen::LoadGsmSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr)
 	{
 		if (sample) delete sample;
@@ -248,7 +255,8 @@ namespace WaveSabreCore
 		sampleLoopStart = 0;
 		sampleLoopLength = sample->SampleLength;
 	}
-	
+#endif
+
 	void Specimen::LoadBlobSample(char *compressedDataPtr, int compressedSize, SampleFormat *sampleFormatPtr)
 	{
 		if (sample) delete sample;

@@ -68,7 +68,10 @@ namespace WaveSabreCore
 		virtual void SetChunk(void *data, int size);
 		virtual int GetChunk(void **data);
 
+#ifdef _WIN32
 		void LoadGsmSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr);
+#endif
+
 		void LoadBlobSample(char *compressedDataPtr, int compressedSize, SampleFormat *formatPtr);
 
 	private:
