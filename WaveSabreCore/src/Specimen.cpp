@@ -230,7 +230,7 @@ namespace WaveSabreCore
 
 		// Write wave format
 		auto waveFormatPtr = (char *)chunkData + headerSize;
-		memcpy(waveFormatPtr, &sample->FormatHeader, waveFormatSize);
+		memcpy(waveFormatPtr, sample->FormatHeader, waveFormatSize);
 
 		// Write compressed data
 		auto compressedDataPtr = waveFormatPtr + waveFormatSize;
