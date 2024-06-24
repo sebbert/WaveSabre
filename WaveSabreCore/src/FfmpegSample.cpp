@@ -88,8 +88,8 @@ namespace WaveSabreCore
 				// Input file path
 				" -i \"%s\""
 
-				// Mix to mono
-				" -ac 1"
+				// Select first audio channel only
+				" -af pan=1|c0=c0"
 
 				// Resample to 44.1 KHz
 				" -ar 44100"
