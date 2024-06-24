@@ -30,7 +30,6 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Random.h
 	include/WaveSabreCore/SampleFormat.h
 	include/WaveSabreCore/UncompressedSample.h
-	include/WaveSabreCore/ExternalSample.h
 	src/AllPass.cpp
 	src/AllPassDelay.cpp
 	src/BiquadFilter.cpp
@@ -59,13 +58,16 @@ add_library(WaveSabreCore
 	src/Barley.cpp
 	src/Vectron.cpp
 	src/Random.cpp
-	src/UncompressedSample.cpp
-	src/ExternalSample.cpp)
+	src/UncompressedSample.cpp)
 
 target_include_directories(WaveSabreCore PUBLIC include)
 
 if (EMSCRIPTEN)
-	target_sources(WaveSabreCore PRIVATE src/NewImpl.cpp)
+	target_sources(WaveSabreCore PRIVATE
+		include/WaveSabreCore/EmscriptenSample.h
+		src/EmscriptenSample.cpp
+		src/NewImpl.cpp
+	)
 endif()
 
 if (WIN32)

@@ -74,6 +74,8 @@ namespace WaveSabreCore
 
 		void LoadBlobSample(char *compressedDataPtr, int compressedSize, SampleFormat *formatPtr);
 
+		void SetSample(UncompressedSample *sample);
+
 	private:
 		class SpecimenVoice : public Voice
 		{

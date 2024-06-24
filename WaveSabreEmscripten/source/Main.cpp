@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include <WaveSabreCore/EmscriptenSample.h>
 #include <WaveSabreEmscripten/SongRenderer.h>
 
 using namespace WaveSabreCore;
@@ -36,10 +37,5 @@ extern "C"
 	EMSCRIPTEN_KEEPALIVE
 	void WaveSabre_RenderSamples(SongRenderer* renderer, Sample* buffer, size_t len) {
 		renderer->RenderSamples(buffer, len);
-	}
-
-	EMSCRIPTEN_KEEPALIVE
-	int main() {
-		return 0;
 	}
 }

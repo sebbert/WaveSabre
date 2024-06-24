@@ -9,24 +9,24 @@ add_executable(WaveSabreEmscripten
 
 target_include_directories(WaveSabreEmscripten PUBLIC include)
 
-target_link_libraries(WaveSabreEmscripten
-	WaveSabreCore)
+target_link_libraries(WaveSabreEmscripten WaveSabreCore)
+
+em_link_js_library(WaveSabreEmscripten "source/library.js")
 
 set(EMSCRIPTEN_EXPORTED_FUNCTIONS
-	"_main"
 	"_WaveSabre_CreateBuffer"
 	"_WaveSabre_DestroyBuffer"
 	"_WaveSabre_CreateSongRenderer"
 	"_WaveSabre_DestroySongRenderer"
 	"_WaveSabre_RenderSamples"
+	"_WaveSabre_FinishUncompressSample"
 )
-
 string(JOIN "," EMSCRIPTEN_EXPORTED_FUNCTIONS_ARG ${EMSCRIPTEN_EXPORTED_FUNCTIONS})
-
 target_link_options(WaveSabreEmscripten PRIVATE
 	"-gsource-map"
 	"-sWASM=1"
 	"-sEXPORTED_FUNCTIONS=${EMSCRIPTEN_EXPORTED_FUNCTIONS_ARG}"
+	"-sALLOW_MEMORY_GROWTH"
 )
-set_target_properties(WaveSabreEmscripten PROPERTIES SUFFIX ".js")
 
+set_target_properties(WaveSabreEmscripten PROPERTIES SUFFIX ".js")

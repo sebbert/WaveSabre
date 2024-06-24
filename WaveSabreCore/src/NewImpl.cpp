@@ -1,27 +1,26 @@
 #include <new>
+#include <emscripten.h>
 
 // Simple bump alloc. which leaks memory
-static char buffer[1024*1024]; // 20 mb buffer for heap
+static char buffer[20 * 1024*1024]; // heap memory
 static int offset;
 
-void * bumpAlloc(std::size_t size)
-{	
-	auto startOfBlock = buffer + offset;
-	offset += size;
-	return (void*)startOfBlock;
-}
-
-void * operator new(std::size_t size)
+extern "C"
 {
-	return bumpAlloc(size);
+	extern void* WaveSabre_Alloc(std::size_t size);
 }
 
-void * operator new[](std::size_t size)
+void* operator new(std::size_t size)
 {
-	return bumpAlloc(size);
+	return WaveSabre_Alloc(size);
 }
 
-void operator delete(void * p) noexcept
+void* operator new[](std::size_t size)
+{
+	return WaveSabre_Alloc(size);
+}
+
+void operator delete(void *p) noexcept
 {
 	//...
 }

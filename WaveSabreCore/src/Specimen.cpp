@@ -2,9 +2,13 @@
 
 #ifdef _WIN32
 #include <WaveSabreCore/GsmSample.h>
+#include <WaveSabreCore/FfmpegSample.h>
 #endif
 
-#include <WaveSabreCore/FfmpegSample.h>
+#ifdef EMSCRIPTEN
+#include <WaveSabreCore/EmscriptenSample.h>
+#endif
+
 #include <WaveSabreCore/Helpers.h>
 
 #include <math.h>
@@ -248,23 +252,34 @@ namespace WaveSabreCore
 #ifdef _WIN32
 	void Specimen::LoadGsmSample(char *compressedDataPtr, int compressedSize, int uncompressedSize, WAVEFORMATEX *waveFormatPtr)
 	{
-		if (sample) delete sample;
-
-		sample = new GsmSample(compressedDataPtr, compressedSize, uncompressedSize, waveFormatPtr);
-
-		sampleLoopStart = 0;
-		sampleLoopLength = sample->SampleLength;
+		SetSample(new GsmSample(compressedDataPtr, compressedSize, uncompressedSize, waveFormatPtr));
 	}
 #endif
 
 	void Specimen::LoadBlobSample(char *compressedDataPtr, int compressedSize, SampleFormat *sampleFormatPtr)
 	{
+#ifdef EMSCRIPTEN
 		if (sample) delete sample;
+		sample = nullptr;
 
-		sample = new FfmpegSample(compressedDataPtr, compressedSize, sampleFormatPtr);
+		auto newSample = new EmscriptenSample(compressedDataPtr, compressedSize, sampleFormatPtr, this);
+		newSample->BeginUncompress();
+#else
+		SetSample(new FfmpegSample(compressedDataPtr, compressedSize, sampleFormatPtr));
+#endif
+	}
 
-		sampleLoopStart = 0;
-		sampleLoopLength = sample->SampleLength;
+	void Specimen::SetSample(UncompressedSample *newSample)
+	{
+		if (sample != newSample)
+		{
+			if (sample) delete sample;
+			sample = newSample;
+		}
+		if (newSample) {
+			sampleLoopStart = 0;
+			sampleLoopLength = newSample->SampleLength;
+		}
 	}
 
 	Specimen::SpecimenVoice::SpecimenVoice(Specimen *specimen)
