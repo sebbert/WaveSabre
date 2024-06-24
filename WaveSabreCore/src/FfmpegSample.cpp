@@ -116,7 +116,7 @@ namespace WaveSabreCore
 
 		// Create process
 
-		STARTUPINFOA startupInfo;
+		STARTUPINFO startupInfo;
 		memset(&startupInfo, 0, sizeof(startupInfo));
 		startupInfo.cb = sizeof(startupInfo);
 		startupInfo.dwFlags |= STARTF_USESHOWWINDOW;
