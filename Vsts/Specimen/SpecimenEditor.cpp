@@ -92,8 +92,8 @@ void SpecimenEditor::Open()
 	addSpacer();
 	addKnob((VstInt32)Specimen::ParamIndices::FineTune, "FINE TUNE");
 	addSpacer();
-	addKnob((VstInt32)Slaughter::ParamIndices::VoiceMode, "MODE");
-	addKnob((VstInt32)Slaughter::ParamIndices::SlideTime, "SLIDE");
+	addKnob((VstInt32)Specimen::ParamIndices::VoiceMode, "MODE");
+	addKnob((VstInt32)Specimen::ParamIndices::SlideTime, "SLIDE");
 	addSpacer();
 	addKnob((VstInt32)Specimen::ParamIndices::Master, "MASTER");
 
