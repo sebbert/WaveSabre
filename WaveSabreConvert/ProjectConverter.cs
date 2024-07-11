@@ -5,6 +5,9 @@ namespace WaveSabreConvert
 {
     public class ProjectConverter
     {
+        public bool ConvertSamples = false;
+        public string ConvertSamplesFfmpegCommandLine = string.Empty;
+
         public Song Convert(string inputFileName, ILog logger)
         {
             Song song;
@@ -42,6 +45,12 @@ namespace WaveSabreConvert
             song.DeltaEncode();
 
             song.Restructure(logger);
+
+            if (ConvertSamples)
+            {
+                logger.WriteLine("Converting samples with ffmpeg command line: {0}", ConvertSamplesFfmpegCommandLine);
+                song.ConvertSamples(ConvertSamplesFfmpegCommandLine, logger);
+            }
 
             return song;
         }

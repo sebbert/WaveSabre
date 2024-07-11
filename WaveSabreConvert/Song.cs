@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace WaveSabreConvert
 {
@@ -306,6 +309,74 @@ namespace WaveSabreConvert
                     });
 
                     lastTime = e.TimeStamp;
+                }
+            }
+        }
+
+        public void ConvertSamples(string ffmpegCommandLine, ILog logger)
+        {
+            foreach (var device in Devices)
+            {
+                if (device.Id == DeviceId.Specimen)
+                {
+                    ConvertSample(device, ffmpegCommandLine, logger);
+                }
+            }
+        }
+
+        void ConvertSample(Device device, string ffmpegCommandLine, ILog logger)
+        {
+            var inputPath = Path.GetTempFileName();
+            var outputPath = Path.GetTempFileName();
+
+            try
+            {
+                var decodedChunk = new SpecimenDecodedChunk();
+                if (!decodedChunk.SetChunk(device.Chunk, logger))
+                {
+                    logger.WriteLine("Failed to convert specimen: failed to read chunk", device.Id);
+                    return;
+                }
+
+                File.WriteAllBytes(inputPath, decodedChunk.CompressedData);
+
+                var ffmpegArgs = $@"-i ""{inputPath}"" {ffmpegCommandLine} -y ""{outputPath}""";
+
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "ffmpeg.exe",
+                    Arguments = ffmpegArgs,
+                    UseShellExecute = false,
+                };
+                var process = Process.Start(processStartInfo);
+                process.WaitForExit();
+                if (process.ExitCode != 0)
+                {
+                    logger.WriteLine($"Failed to convert specimen: ffmpeg exited with code {process.ExitCode}");
+                    return;
+                }
+
+                var reCompressedData = File.ReadAllBytes(outputPath);
+
+                decodedChunk.SetCompressedData(reCompressedData);
+
+                var savedChunk = decodedChunk.GetChunk(logger);
+                device.Chunk = savedChunk;
+            }
+            catch (Exception ex)
+            {
+                logger.WriteLine($"Failed to convert specimen: {ex.Message}");
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(inputPath);
+                    File.Delete(outputPath);
+                }
+                catch (Exception ex)
+                {
+                    logger.WriteLine($"Failed to clean up temporary files: {ex.Message}");
                 }
             }
         }

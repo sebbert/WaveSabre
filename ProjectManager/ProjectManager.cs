@@ -15,6 +15,9 @@ namespace ProjectManager
         public ProjectManager()
         {
             InitializeComponent();
+
+            convertSamplesCheckBox.Checked = Properties.Settings.Default.ConvertSamples;
+            convertSamplesFfmpegCommandLine.Text = Properties.Settings.Default.ConvertSamplesFfmpegCommandLine;
         }
 
         private void buttonOpenProject_Click(object sender, EventArgs e)
@@ -34,7 +37,20 @@ namespace ProjectManager
                 textBoxOutput.Text = "";
                 logger = new EventLogger();
                 logger.OnLog += OnLogEvent;
-                song = new ProjectConverter().Convert(projectFile, logger);
+
+                var settings = Properties.Settings.Default;
+                settings.ConvertSamples = convertSamplesCheckBox.Checked;
+                settings.ConvertSamplesFfmpegCommandLine = convertSamplesFfmpegCommandLine.Text;
+                settings.Save();
+
+                var projectConverter = new ProjectConverter
+                {
+                    ConvertSamples = convertSamplesCheckBox.Checked,
+                    ConvertSamplesFfmpegCommandLine = convertSamplesFfmpegCommandLine.Text
+                };
+
+                song = projectConverter.Convert(projectFile, logger);
+
                 fileName = Path.GetFileNameWithoutExtension(projectFile);
                 textBoxOutput.AppendText("Done.");
                 Enable();
@@ -175,6 +191,11 @@ namespace ProjectManager
             {
                 MessageBox.Show(err.Message);
             }
+        }
+
+        private void convertSamplesCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            convertSamplesFfmpegCommandLine.Enabled = convertSamplesCheckBox.Checked;
         }
     }
 }

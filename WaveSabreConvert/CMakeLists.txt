@@ -14,6 +14,7 @@ set(WAVESABRE_CONVERT_SOURCES
 	RenoiseSong63.cs
 	SendItConfig.cs
 	Serializer.cs
+	SpecimenDecodedChunk.cs
 	Song.cs
 	Utils.cs
 
