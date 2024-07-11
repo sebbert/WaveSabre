@@ -80,5 +80,6 @@
         "ranges": "cpp",
         "span": "cpp",
         "*.rh": "cpp"
-    }
+    },
+    "dotnet.preferCSharpExtension": true
 }
