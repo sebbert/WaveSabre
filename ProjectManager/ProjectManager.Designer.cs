@@ -46,7 +46,7 @@
             // 
             this.buttonOpenProject.Location = new System.Drawing.Point(12, 12);
             this.buttonOpenProject.Name = "buttonOpenProject";
-            this.buttonOpenProject.Size = new System.Drawing.Size(104, 23);
+            this.buttonOpenProject.Size = new System.Drawing.Size(103, 23);
             this.buttonOpenProject.TabIndex = 0;
             this.buttonOpenProject.Text = "Open Project";
             this.buttonOpenProject.UseVisualStyleBackColor = true;
@@ -120,9 +120,9 @@
             // buttonProjectDetails
             // 
             this.buttonProjectDetails.Enabled = false;
-            this.buttonProjectDetails.Location = new System.Drawing.Point(11, 41);
+            this.buttonProjectDetails.Location = new System.Drawing.Point(12, 41);
             this.buttonProjectDetails.Name = "buttonProjectDetails";
-            this.buttonProjectDetails.Size = new System.Drawing.Size(104, 23);
+            this.buttonProjectDetails.Size = new System.Drawing.Size(103, 23);
             this.buttonProjectDetails.TabIndex = 4;
             this.buttonProjectDetails.Text = "Project Details";
             this.buttonProjectDetails.UseVisualStyleBackColor = true;
