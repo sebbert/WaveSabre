@@ -53,6 +53,11 @@ namespace WaveSabreCore
 			VoiceMode,
 			SlideTime,
 
+			Osc1Phase,
+			Osc1PhaseRandom,
+			Osc2Phase,
+			Osc2PhaseRandom,
+
 			NumParams,
 		};
 
@@ -84,9 +89,9 @@ namespace WaveSabreCore
 
 		static double ratioScalar(double coarse, double fine);
 
-		float osc1Waveform, osc1RatioCoarse, osc1RatioFine, osc1Feedback, osc1FeedForward;
+		float osc1Waveform, osc1RatioCoarse, osc1RatioFine, osc1Feedback, osc1FeedForward, osc1Phase, osc1PhaseRandom;
 		float osc1Attack, osc1Decay, osc1Sustain, osc1Release;
-		float osc2Waveform, osc2RatioCoarse, osc2RatioFine, osc2Feedback;
+		float osc2Waveform, osc2RatioCoarse, osc2RatioFine, osc2Feedback, osc2Phase, osc2PhaseRandom;
 		float osc2Attack, osc2Decay, osc2Sustain, osc2Release;
 		float masterLevel;
 		float pitchAttack, pitchDecay, pitchSustain, pitchRelease, pitchEnvAmt1, pitchEnvAmt2;

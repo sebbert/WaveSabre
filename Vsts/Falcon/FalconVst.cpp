@@ -25,6 +25,8 @@ void FalconVst::getParameterName(VstInt32 index, char *text)
 	case Falcon::ParamIndices::Osc1RatioFine: vst_strncpy(text, "Osc1 Rf", kVstMaxParamStrLen); break;
 	case Falcon::ParamIndices::Osc1Feedback: vst_strncpy(text, "Osc1 Fb", kVstMaxParamStrLen); break;
 	case Falcon::ParamIndices::Osc1FeedForward: vst_strncpy(text, "Osc1 Ff", kVstMaxParamStrLen); break;
+	case Falcon::ParamIndices::Osc1Phase: vst_strncpy(text, "Osc1 Ph", kVstMaxParamStrLen); break;
+	case Falcon::ParamIndices::Osc1PhaseRandom: vst_strncpy(text, "Osc1 PhR", kVstMaxParamStrLen); break;
 
 	case Falcon::ParamIndices::Osc1Attack: vst_strncpy(text, "Osc1 Atk", kVstMaxParamStrLen); break;
 	case Falcon::ParamIndices::Osc1Decay: vst_strncpy(text, "Osc1 Dcy", kVstMaxParamStrLen); break;
@@ -35,6 +37,8 @@ void FalconVst::getParameterName(VstInt32 index, char *text)
 	case Falcon::ParamIndices::Osc2RatioCoarse: vst_strncpy(text, "Osc2 Rc", kVstMaxParamStrLen); break;
 	case Falcon::ParamIndices::Osc2RatioFine: vst_strncpy(text, "Osc2 Rf", kVstMaxParamStrLen); break;
 	case Falcon::ParamIndices::Osc2Feedback: vst_strncpy(text, "Osc2 Fb", kVstMaxParamStrLen); break;
+	case Falcon::ParamIndices::Osc2Phase: vst_strncpy(text, "Osc2 Ph", kVstMaxParamStrLen); break;
+	case Falcon::ParamIndices::Osc2PhaseRandom: vst_strncpy(text, "Osc2 PhR", kVstMaxParamStrLen); break;
 
 	case Falcon::ParamIndices::Osc2Attack: vst_strncpy(text, "Osc2 Atk", kVstMaxParamStrLen); break;
 	case Falcon::ParamIndices::Osc2Decay: vst_strncpy(text, "Osc2 Dcy", kVstMaxParamStrLen); break;

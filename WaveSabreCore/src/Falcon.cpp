@@ -15,6 +15,8 @@ namespace WaveSabreCore
 		osc1RatioFine = .5f;
 		osc1Feedback = 0.0f;
 		osc1FeedForward = 0.0f;
+		osc1Phase = 0.0f;
+		osc1PhaseRandom = 1.0f;
 
 		osc1Attack = 1.0f;
 		osc1Decay = 1.0f;
@@ -25,6 +27,8 @@ namespace WaveSabreCore
 		osc2RatioCoarse = 0.0f;
 		osc2RatioFine = .5f;
 		osc2Feedback = 0.0f;
+		osc2Phase = 0.0f;
+		osc2PhaseRandom = 1.0f;
 
 		osc2Attack = 1.0f;
 		osc2Decay = 5.0f;
@@ -50,6 +54,8 @@ namespace WaveSabreCore
 		case ParamIndices::Osc1RatioFine: osc1RatioFine = value; break;
 		case ParamIndices::Osc1Feedback: osc1Feedback = value; break;
 		case ParamIndices::Osc1FeedForward: osc1FeedForward = value; break;
+		case ParamIndices::Osc1Phase: osc1Phase = value; break;
+		case ParamIndices::Osc1PhaseRandom: osc1PhaseRandom = value; break;
 
 		case ParamIndices::Osc1Attack: osc1Attack = Helpers::ScalarToEnvValue(value); break;
 		case ParamIndices::Osc1Decay: osc1Decay = Helpers::ScalarToEnvValue(value); break;
@@ -60,6 +66,8 @@ namespace WaveSabreCore
 		case ParamIndices::Osc2RatioCoarse: osc2RatioCoarse = value; break;
 		case ParamIndices::Osc2RatioFine: osc2RatioFine = value; break;
 		case ParamIndices::Osc2Feedback: osc2Feedback = value; break;
+		case ParamIndices::Osc2Phase: osc2Phase = value; break;
+		case ParamIndices::Osc2PhaseRandom: osc2PhaseRandom = value; break;
 
 		case ParamIndices::Osc2Attack: osc2Attack = Helpers::ScalarToEnvValue(value); break;
 		case ParamIndices::Osc2Decay: osc2Decay = Helpers::ScalarToEnvValue(value); break;
@@ -100,6 +108,8 @@ namespace WaveSabreCore
 		case ParamIndices::Osc1RatioFine: return osc1RatioFine;
 		case ParamIndices::Osc1Feedback: return osc1Feedback;
 		case ParamIndices::Osc1FeedForward: return osc1FeedForward;
+		case ParamIndices::Osc1Phase: return osc1Phase;
+		case ParamIndices::Osc1PhaseRandom: return osc1PhaseRandom;
 
 		case ParamIndices::Osc1Attack: return Helpers::EnvValueToScalar(osc1Attack);
 		case ParamIndices::Osc1Decay: return Helpers::EnvValueToScalar(osc1Decay);
@@ -110,6 +120,8 @@ namespace WaveSabreCore
 		case ParamIndices::Osc2RatioCoarse: return osc2RatioCoarse;
 		case ParamIndices::Osc2RatioFine: return osc2RatioFine;
 		case ParamIndices::Osc2Feedback: return osc2Feedback;
+		case ParamIndices::Osc2Phase: return osc2Phase;
+		case ParamIndices::Osc2PhaseRandom: return osc2PhaseRandom;
 
 		case ParamIndices::Osc2Attack: return Helpers::EnvValueToScalar(osc2Attack);
 		case ParamIndices::Osc2Decay: return Helpers::EnvValueToScalar(osc2Decay);
@@ -202,7 +214,8 @@ namespace WaveSabreCore
 	void Falcon::FalconVoice::NoteOn(int note, int velocity, float detune, float pan)
 	{
 		Voice::NoteOn(note, velocity, detune, pan);
-		osc1Phase = osc2Phase = (double)Helpers::RandFloat();
+		osc1Phase = fmod(falcon->osc1Phase + falcon->osc1PhaseRandom * (double)Helpers::RandFloat(), 1.0);
+		osc2Phase = fmod(falcon->osc2Phase + falcon->osc2PhaseRandom * (double)Helpers::RandFloat(), 1.0);
 		osc1Env.Attack = falcon->osc1Attack;
 		osc1Env.Decay = falcon->osc1Decay;
 		osc1Env.Sustain = falcon->osc1Sustain;
