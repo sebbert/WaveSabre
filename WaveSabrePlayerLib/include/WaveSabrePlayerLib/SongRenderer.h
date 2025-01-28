@@ -28,6 +28,7 @@ namespace WaveSabrePlayerLib
 			Washington,
 			Barley,
 			Vectron,
+			Striker,
 		};
 
 		typedef WaveSabreCore::Device *(*DeviceFactory)(DeviceId);

@@ -9,6 +9,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#define M_LN20 2.995732273553991
+
 namespace WaveSabreCore
 {
 	class Helpers
@@ -31,6 +33,12 @@ namespace WaveSabreCore
 		static inline float Exp10F(float x)
 		{
 			const float scale = (float)(M_LN10 / M_LN2);
+			return Exp2F(x * scale);
+		}
+
+		static inline float Exp20F(float x)
+		{
+			const float scale = (float)(M_LN20 / M_LN2);
 			return Exp2F(x * scale);
 		}
 
@@ -120,6 +128,10 @@ namespace WaveSabreCore
 
 		static VoiceMode ParamToVoiceMode(float param);
 		static float VoiceModeToParam(VoiceMode type);
+
+		static int MsToSamples(double ms);
+
+		static double FreqToWaveLengthSamples(double freq);
 	private:
 		static const int fastSinTabLog2Size = 9; // size = 512
 		static const int fastSinTabSize = (1 << fastSinTabLog2Size);

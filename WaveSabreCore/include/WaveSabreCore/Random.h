@@ -5,7 +5,12 @@ namespace WaveSabreCore
 	class Random
 	{
 	public:
-		inline void Reset()
+		Random()
+		{
+			Reset();
+		}
+
+		void Reset()
 		{
 			Seed = 1;
 		}

@@ -334,4 +334,14 @@ namespace WaveSabreCore
 	{
 		return (float)voiceMode / 1.0f;
 	}
+
+	int Helpers::MsToSamples(double ms)
+	{
+		return (int)(ms * CurrentSampleRate / 1000.0);
+	}
+
+	double Helpers::FreqToWaveLengthSamples(double freq)
+	{
+		return Helpers::CurrentSampleRate / freq;
+	}
 }

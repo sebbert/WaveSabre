@@ -22,6 +22,7 @@ add_library(WaveSabreCore
 	include/WaveSabreCore/Smasher.h
 	include/WaveSabreCore/Specimen.h
 	include/WaveSabreCore/StateVariableFilter.h
+	include/WaveSabreCore/Striker.h
 	include/WaveSabreCore/SynthDevice.h
 	include/WaveSabreCore/Twister.h
 	include/WaveSabreCore/Washington.h
@@ -52,6 +53,7 @@ add_library(WaveSabreCore
 	src/Smasher.cpp
 	src/Specimen.cpp
 	src/StateVariableFilter.cpp
+	src/Striker.cpp
 	src/SynthDevice.cpp
 	src/Twister.cpp
 	src/Washington.cpp

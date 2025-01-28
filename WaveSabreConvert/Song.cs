@@ -22,7 +22,7 @@ namespace WaveSabreConvert
             Twister,
             Cathedral,
             Adultery,
-            Specimen
+            Specimen,
         }
 
         public class Receive

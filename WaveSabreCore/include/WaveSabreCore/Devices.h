@@ -16,6 +16,7 @@
 #include "Washington.h"
 #include "Barley.h"
 #include "Vectron.h"
+#include "Striker.h"
 
 #ifdef _WIN32
 #include "Adultery.h"
