@@ -8,9 +8,12 @@
 			"targets": [
 				"ALL_BUILD"
 			],
-			"group": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true,
+			},
 			"problemMatcher": ["$msCompile", "$msvc"],
-			"detail": "CMake template build task"
+			"detail": "CMake template build task",
 		}
 	]
 }
