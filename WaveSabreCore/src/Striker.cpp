@@ -12,14 +12,35 @@ namespace WaveSabreCore
 
 		noiseImpactLevel = 0.5;
 		sineImpactLevel = 0.5;
+
+		ampAttack = 1.0;
+		ampDecay = Helpers::ScalarToEnvValue(0.5);
+		ampSustain = 1.0;
+		ampRelease = 100.0;
+
+		pitchAttack = 1.0;
+		pitchDecay = 400.0;
+		pitchSustain = 0.0;
+		pitchRelease = 1.0;
 	}
 
 	void Striker::SetParam(int index, float value)
 	{
 		switch ((ParamIndices)index)
 		{
-			case ParamIndices::NoiseImpactLevel: noiseImpactLevel = value;
-			case ParamIndices::SineImpactLevel: sineImpactLevel = value;
+			case ParamIndices::NoiseImpactLevel: noiseImpactLevel = value; break;
+			case ParamIndices::SineImpactLevel: sineImpactLevel = value; break;
+
+			case ParamIndices::AmpAttack: ampAttack = Helpers::ScalarToEnvValue(value); break;
+			case ParamIndices::AmpDecay: ampDecay = Helpers::ScalarToEnvValue(value); break;
+			case ParamIndices::AmpSustain: ampSustain = value; break;
+			case ParamIndices::AmpRelease: ampRelease = Helpers::ScalarToEnvValue(value); break;
+
+			case ParamIndices::PitchAttack: pitchAttack = Helpers::ScalarToEnvValue(value); break;
+			case ParamIndices::PitchDecay: pitchDecay = Helpers::ScalarToEnvValue(value); break;
+			case ParamIndices::PitchSustain: pitchSustain = value; break;
+			case ParamIndices::PitchRelease: pitchRelease = Helpers::ScalarToEnvValue(value); break;
+
 		}
 	}
 
@@ -29,6 +50,17 @@ namespace WaveSabreCore
 		{
 			case ParamIndices::NoiseImpactLevel: return noiseImpactLevel;
 			case ParamIndices::SineImpactLevel: return sineImpactLevel;
+
+			case ParamIndices::AmpAttack: return Helpers::EnvValueToScalar(ampAttack);
+			case ParamIndices::AmpDecay: return Helpers::EnvValueToScalar(ampDecay);
+			case ParamIndices::AmpSustain: return ampSustain;
+			case ParamIndices::AmpRelease: return Helpers::EnvValueToScalar(ampRelease);
+			
+			case ParamIndices::PitchAttack: return Helpers::EnvValueToScalar(pitchAttack);
+			case ParamIndices::PitchDecay: return Helpers::EnvValueToScalar(pitchDecay);
+			case ParamIndices::PitchSustain: return pitchSustain;
+			case ParamIndices::PitchRelease: return Helpers::EnvValueToScalar(pitchRelease);
+
 			default: return 0.0;
 		}
 	}
@@ -64,32 +96,65 @@ namespace WaveSabreCore
 				}
 			}
 
-			double freq = Helpers::NoteToFreq(Note);
+			double note = GetNote();
+			double baseFreq = Helpers::NoteToFreq(note);
 
+			pitchEnv.Next();
+			float pitchEnvValue = pitchEnv.GetValue();
+			float pitchEnvPow10 = powf(pitchEnvValue, 10.0f);
+			float pitchEnvPow20 = powf(pitchEnvValue, 20.0f);
+			double combFreq = baseFreq * (1.0 + (double)(pitchEnvPow10 * (velocity + 2.0f)));
 
-			comb.SetLengthSamples(waveLengthSamples);
+			comb.SetLengthSamples((int)Helpers::FreqToWaveLengthSamples(combFreq));
 			float combOut = comb.Read();
-			float combIn = impulse + combOut * 0.95;
+			float combIn = impulse + combOut * 0.98f;
 			comb.Write(combIn);
 
-			outputs[0][sampleIndex] += combOut;
-			outputs[1][sampleIndex] += combOut;
+			ampEnv.Next();
+			float masterOut = combOut * ampEnv.GetValue();
+
+			outputs[0][sampleIndex] += masterOut;
+			outputs[1][sampleIndex] += masterOut;
 
 			currentSamples += 1;
 		}
+
+		if (ampEnv.State == EnvelopeState::Finished)
+		{
+			IsOn = false;
+		}
 	}
 
-	void Striker::StrikerVoice::NoteOn(int note, int velocity, float detune, float pan)
+	void Striker::StrikerVoice::NoteOn(int note, int velocityInt, float detune, float pan)
 	{
-		Voice::NoteOn(note, velocity, detune, pan);
-		double freq = Helpers::NoteToFreq(GetNote());
-		waveLengthSamples = (int)(Helpers::CurrentSampleRate / freq);
+		Voice::NoteOn(note, velocityInt, detune, pan);
+		
+		velocity = (float)velocityInt / 127.0;
+		
+		double baseFreq = Helpers::NoteToFreq(GetNote());
+		waveLengthSamples = (int)(Helpers::CurrentSampleRate / baseFreq);
 		currentSamples = 0;
+		
 		noise.Reset();
+
+		pitchEnv.Attack = striker->pitchAttack;
+		pitchEnv.Decay = striker->pitchDecay;
+		pitchEnv.Sustain = striker->pitchSustain;
+		pitchEnv.Release = striker->pitchRelease;
+		pitchEnv.Trigger();
+
+		ampEnv.Attack = striker->ampAttack;
+		ampEnv.Decay = striker->ampDecay;
+		ampEnv.Sustain = striker->ampSustain;
+		ampEnv.Release = striker->ampRelease;
+		ampEnv.Trigger();
 	}
 
 	void Striker::StrikerVoice::NoteOff()
 	{
+		Voice::NoteOff();
+		pitchEnv.Off();
+		ampEnv.Off();
 	}
 
 	Striker::VariableDelay::VariableDelay(float capacityMs)

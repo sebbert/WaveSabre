@@ -15,6 +15,15 @@ namespace WaveSabreCore
 			NoiseImpactLevel,
 			SineImpactLevel,
 
+			PitchAttack,
+			PitchDecay,
+			PitchSustain,
+			PitchRelease,
+
+			AmpAttack,
+			AmpDecay,
+			AmpSustain,
+			AmpRelease,
 
 			NumParams,
 		};
@@ -25,7 +34,10 @@ namespace WaveSabreCore
 		virtual float GetParam(int index) const;
 
 	protected:
-		float noiseImpactLevel, sineImpactLevel;
+		float noiseImpactLevel;
+		float sineImpactLevel;
+		float pitchAttack, pitchDecay, pitchSustain, pitchRelease;
+		float ampAttack, ampDecay, ampSustain, ampRelease;
 
 		class VariableDelay
 		{
@@ -65,11 +77,13 @@ namespace WaveSabreCore
 
 		private:
 			Striker *striker;
+			double freq;
+			float velocity;
 			int waveLengthSamples;
 			int currentSamples;
 			VariableDelay comb, allpass;
 			Random noise;
-			Envelope pitchEnv;
+			Envelope pitchEnv, ampEnv;
 
 		};
 	};
