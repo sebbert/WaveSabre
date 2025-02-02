@@ -80,6 +80,8 @@ namespace WaveSabreCore
 		static double FastCos(double x);
 		static double FastSin(double x);
 
+		static float FastTanh(float x);
+
 		static double NoteToFreq(double note);
 
 		static double Square135(double phase);

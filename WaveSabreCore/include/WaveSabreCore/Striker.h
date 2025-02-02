@@ -4,6 +4,7 @@
 #include "SynthDevice.h"
 #include "Envelope.h"
 #include "Random.h"
+#include "BiquadFilter.h"
 
 namespace WaveSabreCore
 {
@@ -12,8 +13,12 @@ namespace WaveSabreCore
 	public:
 		enum class ParamIndices
 		{
-			NoiseImpactLevel,
-			SineImpactLevel,
+			NoiseImpulseLevel,
+			SineImpulseLevel,
+
+			CombFeedback,
+			AllpassGain,
+			Damping,
 
 			PitchAttack,
 			PitchDecay,
@@ -34,16 +39,21 @@ namespace WaveSabreCore
 		virtual float GetParam(int index) const;
 
 	protected:
-		float noiseImpactLevel;
-		float sineImpactLevel;
+		float noiseImpulseLevel;
+		float sineImpulseLevel;
+		float combFeedback;
 		float pitchAttack, pitchDecay, pitchSustain, pitchRelease;
 		float ampAttack, ampDecay, ampSustain, ampRelease;
+		float allpassGain;
+		float damping;
 
 		class VariableDelay
 		{
 		public:
 			VariableDelay(float capacityMs);
 			~VariableDelay();
+
+			void Clear();
 
 			void SetLengthMs(float lengthMs);
 			void SetLengthSamples(int length);
@@ -63,6 +73,22 @@ namespace WaveSabreCore
 			int writeHead;
 		};
 
+		class OnePoleFilter
+		{
+		public:
+			float ProcessLowpass(float input);
+			float ProcessHighpass(float input);
+
+			void SetFreq(double freq);
+			void SetCoef(float newCoef);
+
+			static float FreqToCoef(double freq);
+
+		private:
+			float coef;
+			float state;
+		};
+
 		class StrikerVoice : public Voice
 		{
 		public:
@@ -80,11 +106,12 @@ namespace WaveSabreCore
 			double freq;
 			float velocity;
 			int waveLengthSamples;
-			int currentSamples;
-			VariableDelay comb, allpass;
+			int elapsedSamples;
+			VariableDelay combDelay, allpassDelay;
+			OnePoleFilter combHighpassFilter, dampFilter;
 			Random noise;
 			Envelope pitchEnv, ampEnv;
-
+			
 		};
 	};
 }

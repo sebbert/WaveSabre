@@ -10,8 +10,12 @@ namespace WaveSabreCore
 	{
 		for (int i = 0; i < maxVoices; i++) voices[i] = new StrikerVoice(this);
 
-		noiseImpactLevel = 0.5;
-		sineImpactLevel = 0.5;
+		noiseImpulseLevel = 0.5;
+		sineImpulseLevel = 0.5;
+
+		combFeedback = 0.98f;
+		allpassGain = 0.5f;
+		damping = 0.5f;
 
 		ampAttack = 1.0;
 		ampDecay = Helpers::ScalarToEnvValue(0.5);
@@ -28,8 +32,12 @@ namespace WaveSabreCore
 	{
 		switch ((ParamIndices)index)
 		{
-			case ParamIndices::NoiseImpactLevel: noiseImpactLevel = value; break;
-			case ParamIndices::SineImpactLevel: sineImpactLevel = value; break;
+			case ParamIndices::NoiseImpulseLevel: noiseImpulseLevel = value; break;
+			case ParamIndices::SineImpulseLevel: sineImpulseLevel = value; break;
+
+			case ParamIndices::CombFeedback: combFeedback = 1.0f - (float)Helpers::Pow4(1.0 - (double)value); break;
+			case ParamIndices::AllpassGain: allpassGain = value; break;
+			case ParamIndices::Damping: damping = value; break;
 
 			case ParamIndices::AmpAttack: ampAttack = Helpers::ScalarToEnvValue(value); break;
 			case ParamIndices::AmpDecay: ampDecay = Helpers::ScalarToEnvValue(value); break;
@@ -48,8 +56,12 @@ namespace WaveSabreCore
 	{
 		switch ((ParamIndices)index)
 		{
-			case ParamIndices::NoiseImpactLevel: return noiseImpactLevel;
-			case ParamIndices::SineImpactLevel: return sineImpactLevel;
+			case ParamIndices::NoiseImpulseLevel: return noiseImpulseLevel;
+			case ParamIndices::SineImpulseLevel: return sineImpulseLevel;
+
+			case ParamIndices::CombFeedback: return 1.0f - (float)sqrt(sqrt(1.0 - combFeedback));
+			case ParamIndices::AllpassGain: return allpassGain;
+			case ParamIndices::Damping: return damping;
 
 			case ParamIndices::AmpAttack: return Helpers::EnvValueToScalar(ampAttack);
 			case ParamIndices::AmpDecay: return Helpers::EnvValueToScalar(ampDecay);
@@ -67,10 +79,11 @@ namespace WaveSabreCore
 
 	Striker::StrikerVoice::StrikerVoice(Striker *striker)
 		: striker(striker)
-		, comb(1000.0)
-		, allpass(1000.0)
+		, combDelay(1000.0)
+		, allpassDelay(1000.0)
 		, noise()
 	{
+		combHighpassFilter.SetFreq(20.0);
 	}
 
 	SynthDevice *Striker::StrikerVoice::GetSynthDevice() const
@@ -80,20 +93,15 @@ namespace WaveSabreCore
 
 	void Striker::StrikerVoice::Run(double songPosition, float **outputs, int numSamples)
 	{
-		for (int sampleIndex = 0; sampleIndex < numSamples; ++sampleIndex)
+		for (int i = 0; i < numSamples; ++i, ++elapsedSamples)
 		{
-			float impulse = 0.0;
-			if (currentSamples <= waveLengthSamples)
+			float noiseImpulse = 0.0f, sineImpulse = 0.0f, impulse = 0.0f;
+			if (elapsedSamples <= waveLengthSamples)
 			{
-				if (striker->sineImpactLevel > 0.0f)
-				{
-					double t = (double)currentSamples / (double)waveLengthSamples;
-					impulse += striker->sineImpactLevel * (float)Helpers::FastSin(t * 2.0 * M_PI);
-				}
-				if (striker -> noiseImpactLevel > 0.0f)
-				{
-					impulse += striker->noiseImpactLevel * noise.Next();
-				}
+				double t = (double)elapsedSamples / (double)waveLengthSamples;
+				noiseImpulse = striker->sineImpulseLevel * (float)Helpers::FastSin(t * 2.0 * M_PI);
+				sineImpulse = striker->noiseImpulseLevel * noise.Next();
+				impulse = noiseImpulse + sineImpulse;
 			}
 
 			double note = GetNote();
@@ -101,22 +109,30 @@ namespace WaveSabreCore
 
 			pitchEnv.Next();
 			float pitchEnvValue = pitchEnv.GetValue();
-			float pitchEnvPow10 = powf(pitchEnvValue, 10.0f);
-			float pitchEnvPow20 = powf(pitchEnvValue, 20.0f);
-			double combFreq = baseFreq * (1.0 + (double)(pitchEnvPow10 * (velocity + 2.0f)));
+			float pitchEnvPow10 = powf(pitchEnvValue, 5.0f);
+			float pitchEnvPow20 = pitchEnvPow10 * pitchEnvPow10;
 
-			comb.SetLengthSamples((int)Helpers::FreqToWaveLengthSamples(combFreq));
-			float combOut = comb.Read();
-			float combIn = impulse + combOut * 0.98f;
-			comb.Write(combIn);
+			float velocityGain = Helpers::Exp2F(-24.0f * (1.0f - velocity) / 6.0f);
+
+			double combFreq = baseFreq * (1.0 + (double)(pitchEnvPow10*(velocity+2.0)));
+			combDelay.SetLengthSamples((int)Helpers::FreqToWaveLengthSamples(combFreq));
+
+			double allpassFreq = 230.0 * (double)(2.0 + pitchEnvPow20 * velocity);
+			allpassDelay.SetLengthSamples((int)Helpers::FreqToWaveLengthSamples(allpassFreq));
+
+			float combDelayOut = combDelay.Read();
+			float combHighpassOut = combHighpassFilter.ProcessHighpass(combDelayOut);
+			float allpassIn = impulse + Helpers::FastTanh(combHighpassOut * striker->combFeedback);
+			float allpassOut = allpassDelay.ProcessAllpass(allpassIn, striker->allpassGain);
+			float dampFilterOut = dampFilter.ProcessLowpass(allpassOut);
+			combDelay.Write(dampFilterOut);
+			float resonatorOut = Helpers::FastTanh(dampFilterOut);// + noiseImpulse * velocityGain * 2.0);
 
 			ampEnv.Next();
-			float masterOut = combOut * ampEnv.GetValue();
+			float masterOut = resonatorOut * ampEnv.GetValue();
 
-			outputs[0][sampleIndex] += masterOut;
-			outputs[1][sampleIndex] += masterOut;
-
-			currentSamples += 1;
+			outputs[0][i] += masterOut;
+			outputs[1][i] += masterOut;
 		}
 
 		if (ampEnv.State == EnvelopeState::Finished)
@@ -129,13 +145,17 @@ namespace WaveSabreCore
 	{
 		Voice::NoteOn(note, velocityInt, detune, pan);
 		
-		velocity = (float)velocityInt / 127.0;
+		velocity = Helpers::Clamp((float)velocityInt / 127.0f, 0.0f, 1.0f);
 		
 		double baseFreq = Helpers::NoteToFreq(GetNote());
-		waveLengthSamples = (int)(Helpers::CurrentSampleRate / baseFreq);
-		currentSamples = 0;
+		waveLengthSamples = (int)Helpers::FreqToWaveLengthSamples(baseFreq);
+		elapsedSamples = 0;
 		
 		noise.Reset();
+
+		combDelay.Clear();
+
+		dampFilter.SetCoef(striker->damping);
 
 		pitchEnv.Attack = striker->pitchAttack;
 		pitchEnv.Decay = striker->pitchDecay;
@@ -157,19 +177,51 @@ namespace WaveSabreCore
 		ampEnv.Off();
 	}
 
+	float Striker::OnePoleFilter::ProcessLowpass(float input)
+	{
+		state = Helpers::Mix(input, state, coef);
+		return state;
+	}
+
+	float Striker::OnePoleFilter::ProcessHighpass(float input)
+	{
+		return input - ProcessLowpass(input);
+	}
+
+	void Striker::OnePoleFilter::SetFreq(double freq)
+	{
+		SetCoef((float)FreqToCoef(freq));
+	}
+
+	void Striker::OnePoleFilter::SetCoef(float newCoef)
+	{
+		coef = Helpers::Clamp(newCoef, 0.0f, 1.0f);
+	}
+
+	float Striker::OnePoleFilter::FreqToCoef(double freq)
+	{
+		constexpr double LOG2_E = 1.4426950408889634;
+		return (float)Helpers::Exp2(LOG2_E * 2.0 * M_PI * freq / Helpers::CurrentSampleRate);
+	}
+
 	Striker::VariableDelay::VariableDelay(float capacityMs)
 	{
 		readHead = 0;
 		writeHead = 0;
 		capacity = Helpers::MsToSamples(capacityMs);
 		buffer = new float[capacity];
-		for (int i = 0; i < capacity; ++i) buffer[i] = 0.0f;
+		Clear();
 		SetLengthSamples(capacity);
 	}
 
 	Striker::VariableDelay::~VariableDelay()
 	{
 		delete[] buffer;
+	}
+
+	void Striker::VariableDelay::Clear()
+	{
+		for (int i = 0; i < capacity; ++i) buffer[i] = 0.0f;
 	}
 
 	void Striker::VariableDelay::SetLengthMs(float newLengthMs)
@@ -189,14 +241,15 @@ namespace WaveSabreCore
 
 	void Striker::VariableDelay::Write(float sample)
 	{
-		writeHead = advanceHead(writeHead);
 		buffer[writeHead] = sample;
+		writeHead = advanceHead(writeHead);
 	}
 
 	float Striker::VariableDelay::Read()
 	{
+		float sample = buffer[readHead];
 		readHead = advanceHead(readHead);
-		return buffer[readHead];
+		return sample;
 	}
 
 	int Striker::VariableDelay::advanceHead(int head) const

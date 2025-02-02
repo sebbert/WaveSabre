@@ -14,12 +14,12 @@ StrikerEditor::~StrikerEditor()
 
 void StrikerEditor::Open()
 {
-	addKnob((VstInt32)Striker::ParamIndices::NoiseImpactLevel, "NOISE IMPULSE");
+	addKnob((VstInt32)Striker::ParamIndices::NoiseImpulseLevel, "NOISE IMPULSE");
 	addSpacer();
 
 	startNextRow();
 
-	addKnob((VstInt32)Striker::ParamIndices::SineImpactLevel, "SINE IMPULSE");
+	addKnob((VstInt32)Striker::ParamIndices::SineImpulseLevel, "SINE IMPULSE");
 	addSpacer();
 
 	VstEditor::Open();

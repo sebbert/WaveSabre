@@ -154,6 +154,13 @@ namespace WaveSabreCore
 		return left + (right - left) * fractMix;
 	}
 
+	float Helpers::FastTanh(float x)
+	{
+		x = Helpers::Clamp(x, -3.0, 3.0);
+		float x2 = Helpers::Pow2F(x);
+		return x * (x2 + 27.0) / (x2 * 9.0 + 27.0);
+	}
+
 	double Helpers::Square135(double phase)
 	{
 		return FastSin(phase) +
