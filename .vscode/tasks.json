@@ -5,9 +5,7 @@
 			"type": "cmake",
 			"label": "CMake: build",
 			"command": "build",
-			"targets": [
-				"ALL_BUILD"
-			],
+			// "targets": ["ALL_BUILD"], // Use the "CMake: Set build target" command instead
 			"group": {
 				"kind": "build",
 				"isDefault": true,
