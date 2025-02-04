@@ -143,8 +143,8 @@ namespace WaveSabreCore
 			float allpassOut = allpassDelay.ProcessAllpass(allpassIn, striker->allpassGain);
 			float dampFilterOut = dampFilter.ProcessLowpass(allpassOut);
 			combDelay.Write(dampFilterOut);
-			float resonatorOut = Helpers::FastTanh(dampFilterOut);// + noiseImpulse * velocityGain * 2.0);
-
+			float resonatorOut = Helpers::FastTanh(dampFilterOut + noiseImpulse * velocityGain * 2.0f);
+ 
 			ampEnv.Next();
 			float masterOut = resonatorOut * ampEnv.GetValue();
 
