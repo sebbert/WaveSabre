@@ -171,7 +171,11 @@ namespace WaveSabreCore
 		noise.Reset();
 
 		combDelay.Clear();
+		allpassDelay.Clear();
 
+		combHighpassFilter.Reset();
+
+		dampFilter.Reset();
 		dampFilter.SetCoef(striker->damping);
 
 		pitchEnv.Attack = striker->pitchAttack;
@@ -203,6 +207,11 @@ namespace WaveSabreCore
 	float Striker::OnePoleFilter::ProcessHighpass(float input)
 	{
 		return input - ProcessLowpass(input);
+	}
+
+	void Striker::OnePoleFilter::Reset()
+	{
+		state = 0;
 	}
 
 	void Striker::OnePoleFilter::SetFreq(double freq)
