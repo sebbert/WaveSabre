@@ -13,9 +13,13 @@ namespace WaveSabreCore
 		noiseImpulseLevel = 0.5;
 		sineImpulseLevel = 0.5;
 
-		combFeedback = 0.98f;
-		allpassGain = 0.5f;
+		feedback = 0.98f;
 		damping = 0.5f;
+
+		allpassGain = 0.5f;
+		allpassFreq = 0.0;
+		allpassRatioCoarse = 2.0;
+		allpassRatioFine = 0.5;
 
 		ampAttack = 1.0;
 		ampDecay = Helpers::ScalarToEnvValue(0.5);
@@ -23,7 +27,7 @@ namespace WaveSabreCore
 		ampRelease = 100.0;
 
 		pitchAttack = 1.0;
-		pitchDecay = 400.0;
+		pitchDecay = 30.0;
 		pitchSustain = 0.0;
 		pitchRelease = 1.0;
 	}
@@ -35,9 +39,13 @@ namespace WaveSabreCore
 			case ParamIndices::NoiseImpulseLevel: noiseImpulseLevel = value; break;
 			case ParamIndices::SineImpulseLevel: sineImpulseLevel = value; break;
 
-			case ParamIndices::CombFeedback: combFeedback = 1.0f - (float)Helpers::Pow4(1.0 - (double)value); break;
-			case ParamIndices::AllpassGain: allpassGain = value; break;
+			case ParamIndices::Feedback: feedback = 1.0f - (float)Helpers::Pow4(1.0 - (double)value); break;
 			case ParamIndices::Damping: damping = value; break;
+
+			case ParamIndices::AllpassGain: allpassGain = value; break;
+			case ParamIndices::AllpassFreq: allpassFreq = Helpers::ParamToFrequency(value) - 20.0f; break;
+			case ParamIndices::AllpassRatioCoarse: allpassRatioCoarse = floorf(value * maxAllpassRatioCoarse); break;
+			case ParamIndices::AllpassRatioFine: allpassRatioFine = value; break;
 
 			case ParamIndices::AmpAttack: ampAttack = Helpers::ScalarToEnvValue(value); break;
 			case ParamIndices::AmpDecay: ampDecay = Helpers::ScalarToEnvValue(value); break;
@@ -59,9 +67,13 @@ namespace WaveSabreCore
 			case ParamIndices::NoiseImpulseLevel: return noiseImpulseLevel;
 			case ParamIndices::SineImpulseLevel: return sineImpulseLevel;
 
-			case ParamIndices::CombFeedback: return 1.0f - (float)sqrt(sqrt(1.0 - combFeedback));
-			case ParamIndices::AllpassGain: return allpassGain;
+			case ParamIndices::Feedback: return 1.0f - (float)sqrt(sqrt(1.0 - feedback));
 			case ParamIndices::Damping: return damping;
+
+			case ParamIndices::AllpassGain: return allpassGain;
+			case ParamIndices::AllpassFreq: return Helpers::FrequencyToParam(allpassFreq + 20.0f);
+			case ParamIndices::AllpassRatioCoarse: return allpassRatioCoarse / maxAllpassRatioCoarse;
+			case ParamIndices::AllpassRatioFine: return allpassRatioFine;
 
 			case ParamIndices::AmpAttack: return Helpers::EnvValueToScalar(ampAttack);
 			case ParamIndices::AmpDecay: return Helpers::EnvValueToScalar(ampDecay);
@@ -109,20 +121,25 @@ namespace WaveSabreCore
 
 			pitchEnv.Next();
 			float pitchEnvValue = pitchEnv.GetValue();
-			float pitchEnvPow10 = powf(pitchEnvValue, 5.0f);
-			float pitchEnvPow20 = pitchEnvPow10 * pitchEnvPow10;
+
+			// Envelope already squares the decay and release slopes, so these are really 10 and 20
+			float pitchEnvPow5 = pitchEnvValue * pitchEnvValue * pitchEnvValue * pitchEnvValue * pitchEnvValue;
+			float pitchEnvPow10 = pitchEnvPow5 * pitchEnvPow5;
 
 			float velocityGain = Helpers::Exp2F(-24.0f * (1.0f - velocity) / 6.0f);
 
-			double combFreq = baseFreq * (1.0 + (double)(pitchEnvPow10*(velocity+2.0)));
+			double combFreq = baseFreq * (1.0 + (double)(pitchEnvPow5*(velocity+2.0)));
 			combDelay.SetLengthSamples((int)Helpers::FreqToWaveLengthSamples(combFreq));
 
-			double allpassFreq = 230.0 * (double)(2.0 + pitchEnvPow20 * velocity);
+			double allpassFineBase = Helpers::Pow2(((double)striker->allpassRatioFine - .5) * 2.0);
+			double allpassRatio = floor((double)striker->allpassRatioCoarse) + allpassFineBase * allpassFineBase * allpassFineBase;
+			double allpassBaseFreq = striker->allpassFreq + baseFreq * allpassRatio;
+			double allpassFreq = allpassBaseFreq * (double)(2.0 + pitchEnvPow10 * velocity);
 			allpassDelay.SetLengthSamples((int)Helpers::FreqToWaveLengthSamples(allpassFreq));
 
 			float combDelayOut = combDelay.Read();
 			float combHighpassOut = combHighpassFilter.ProcessHighpass(combDelayOut);
-			float allpassIn = impulse + Helpers::FastTanh(combHighpassOut * striker->combFeedback);
+			float allpassIn = impulse + Helpers::FastTanh(combHighpassOut * striker->feedback);
 			float allpassOut = allpassDelay.ProcessAllpass(allpassIn, striker->allpassGain);
 			float dampFilterOut = dampFilter.ProcessLowpass(allpassOut);
 			combDelay.Write(dampFilterOut);

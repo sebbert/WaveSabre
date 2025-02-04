@@ -23,9 +23,13 @@ void StrikerVst::getParameterName(VstInt32 index, char *text)
 	case Striker::ParamIndices::NoiseImpulseLevel: vst_strncpy(text, "NsImpLv", kVstMaxParamStrLen); break;
 	case Striker::ParamIndices::SineImpulseLevel: vst_strncpy(text, "SinImpLv", kVstMaxParamStrLen); break;
 	
-	case Striker::ParamIndices::CombFeedback: vst_strncpy(text, "Comb FB", kVstMaxParamStrLen); break;
-	case Striker::ParamIndices::AllpassGain: vst_strncpy(text, "AP Gain", kVstMaxParamStrLen); break;
+	case Striker::ParamIndices::Feedback: vst_strncpy(text, "Comb FB", kVstMaxParamStrLen); break;
 	case Striker::ParamIndices::Damping: vst_strncpy(text, "Damping", kVstMaxParamStrLen); break;
+
+	case Striker::ParamIndices::AllpassGain: vst_strncpy(text, "Ap Gain", kVstMaxParamStrLen); break;
+	case Striker::ParamIndices::AllpassFreq: vst_strncpy(text, "Ap Freq", kVstMaxParamStrLen); break;
+	case Striker::ParamIndices::AllpassRatioCoarse: vst_strncpy(text, "Ap Rc", kVstMaxParamStrLen); break;
+	case Striker::ParamIndices::AllpassRatioFine: vst_strncpy(text, "Ap Rf", kVstMaxParamStrLen); break;
 
 	case Striker::ParamIndices::PitchAttack: vst_strncpy(text, "P Atk", kVstMaxParamStrLen); break;
 	case Striker::ParamIndices::PitchDecay: vst_strncpy(text, "P Dcy", kVstMaxParamStrLen); break;

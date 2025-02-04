@@ -16,9 +16,13 @@ namespace WaveSabreCore
 			NoiseImpulseLevel,
 			SineImpulseLevel,
 
-			CombFeedback,
-			AllpassGain,
+			Feedback,
 			Damping,
+			
+			AllpassGain,
+			AllpassFreq,
+			AllpassRatioCoarse,
+			AllpassRatioFine,
 
 			PitchAttack,
 			PitchDecay,
@@ -39,13 +43,15 @@ namespace WaveSabreCore
 		virtual float GetParam(int index) const;
 
 	protected:
+		static constexpr float maxAllpassRatioCoarse = 8.0;
+
 		float noiseImpulseLevel;
 		float sineImpulseLevel;
-		float combFeedback;
+		float feedback;
+		float allpassGain, allpassFreq, allpassRatioCoarse, allpassRatioFine;
+		float damping;
 		float pitchAttack, pitchDecay, pitchSustain, pitchRelease;
 		float ampAttack, ampDecay, ampSustain, ampRelease;
-		float allpassGain;
-		float damping;
 
 		class VariableDelay
 		{
@@ -79,6 +85,8 @@ namespace WaveSabreCore
 			float ProcessLowpass(float input);
 			float ProcessHighpass(float input);
 
+			void Reset();
+
 			void SetFreq(double freq);
 			void SetCoef(float newCoef);
 
@@ -103,7 +111,8 @@ namespace WaveSabreCore
 
 		private:
 			Striker *striker;
-			double freq;
+			double noteFreq;
+			double allpassFreq;
 			float velocity;
 			int waveLengthSamples;
 			int elapsedSamples;
@@ -111,7 +120,6 @@ namespace WaveSabreCore
 			OnePoleFilter combHighpassFilter, dampFilter;
 			Random noise;
 			Envelope pitchEnv, ampEnv;
-			
 		};
 	};
 }
